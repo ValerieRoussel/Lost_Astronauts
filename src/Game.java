@@ -18,7 +18,7 @@ public class Game extends JPanel {
     public Game() {
         wallList = new ArrayList<Obj>();
         stuffList = new ArrayList<Obj>();
-        p1 = new Player(0, 0, 16, 16, 1);
+        p1 = new Player(0, 0, 16, 16, 2);
         cam1 = new Camera();
         Dimension levelDim = new Dimension(0, 0);
         l1 = new LevelLoader();
