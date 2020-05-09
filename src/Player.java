@@ -29,6 +29,10 @@ public class Player extends Obj {
     boolean to_crouch;
     boolean to_shoot;
 
+    int playerNum;
+    int hp;
+    boolean connected;
+
     private Image idleL;
     private Image idleR;
     private Image[] walkL;
@@ -55,6 +59,10 @@ public class Player extends Obj {
         this.speed = 2;
         this.fallSpeed = 3;
         wallJump = false;
+
+        this.playerNum = playerNum;
+        hp = 1;
+        connected = true;
 
         idleL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleLeft.png").getImage();
         idleR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png").getImage();

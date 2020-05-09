@@ -26,17 +26,17 @@ public class Camera {
         }
 
         camX = -moveRect.x + ((200-rectWidth)/2);
-        camY = -moveRect.y + ((150-rectHeight)/2) - 20;
+        camY = -moveRect.y + ((132-rectHeight)/2) - 10;
 
         if (camX > 0) {
             camX = 0;
-        } else if (camX < -levelWidth + 196) {
-            camX = -levelWidth + 196;
+        } else if (camX < -levelWidth + 200) {
+            camX = -levelWidth + 200;
         }
         if (camY > 0) {
             camY = 0;
-        } else if (camY < -levelHeight + 140) {
-            camY = -levelHeight + 140;
+        } else if (camY < -levelHeight + 122) {
+            camY = -levelHeight + 122;
         }
 
     }

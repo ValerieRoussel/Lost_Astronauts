@@ -15,18 +15,20 @@ public class Game extends JPanel {
     Player p2;
     Player currPlayer;
     private Camera cam1;
+    private UI ui;
     private LevelLoader l1;
     private ArrayList<Obj> wallList;
     private ArrayList<Obj> stuffList;
     private ArrayList<Bullet> bulletList;
 
-    public Game() {
+    public Game(UI ui) {
         wallList = new ArrayList<Obj>();
         stuffList = new ArrayList<Obj>();
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
         cam1 = new Camera();
+        this.ui = ui;
         Dimension levelDim = new Dimension(0, 0);
         l1 = new LevelLoader();
         try {
@@ -81,7 +83,10 @@ public class Game extends JPanel {
                 }
             }
             cam1.reposition(currPlayer, levelWidth * 16, levelHeight * 16);
+            ui.updateUI(currPlayer, p1, p2);
+
             repaint();
+            ui.repaint();
 
             nextTick += skip;
             sleepTime = nextTick - System.currentTimeMillis();
@@ -96,7 +101,7 @@ public class Game extends JPanel {
     public void paint(Graphics g) {
         ((Graphics2D)g).scale(4, 4);
         g.translate(cam1.camX, cam1.camY);
-        g.setColor(Color.BLACK);
+        g.setColor(Color.DARK_GRAY);
         g.fillRect(0, 0, levelWidth * 16, levelHeight * 16);
         for (Obj i : stuffList) {
             g.drawImage(i.img, i.x, i.y, null);
