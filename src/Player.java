@@ -149,19 +149,19 @@ public class Player extends Obj {
             return sR;
         }*/
         if (dy < 0) {
-            if (dx < 0 || (to_left && !to_right) || !lastDirection) {
+            if (!lastDirection) {
                 return jlu;
             } else {
                 return jru;
             }
         } else if (dy > 0) {
-            if (dx < 0 || (to_left && !to_right) || !lastDirection) {
+            if (!lastDirection) {
                 return jld;
             } else {
                 return jrd;
             }
         } else {
-            if (dx < 0 || (to_left && !to_right) || !lastDirection) {
+            if (!lastDirection) {
                 return jl;
             } else {
                 return jr;
@@ -234,10 +234,12 @@ public class Player extends Obj {
        if (to_left && !to_right && !crouching) {
            if (dx > speed * (-1) && frameNum % 3 == 0) {
                dx -= 0.25;
+               lastDirection = false;
            }
        } else if (!to_left && to_right && !crouching) {
            if (dx < speed && frameNum % 3 == 0) {
                dx += 0.25;
+               lastDirection = true;
            }
        } else {
            if (dx > 0 && frameNum % 2 == 0) {
@@ -245,9 +247,14 @@ public class Player extends Obj {
            } else if (dx < 0 && frameNum % 2 == 0) {
                dx += 0.25;
            }
+           if (lastDirection && to_left && !to_right && crouching) {
+               lastDirection = false;
+           } else if (!lastDirection && to_right && !to_left && crouching) {
+               lastDirection = true;
+           }
        }
 
-       if (dx < 0 || (to_left && !to_right)) {
+       if (to_left && !to_right) {
            if (grounded) {
                if (animFrame == 23) {
                    animFrame = 0;
@@ -255,20 +262,18 @@ public class Player extends Obj {
                    animFrame++;
                }
                img = walkL[animFrame / 3];
-               lastDirection = false;
            }
            xChange = (int)Math.ceil(dx);
            if (frameNum % 4 < ((dx - Math.ceil(dx)) * -4)) {
                xChange--;
            }
-       } else if (dx > 0  || (!to_left && to_right)) {
+       } else if (!to_left && to_right) {
            if (grounded) {
                if (animFrame == 23) {
                    animFrame = 0;
                } else {
                    animFrame++;
                }
-               lastDirection = true;
                img = walkR[animFrame / 3];
            }
            xChange = (int)Math.floor(dx);
