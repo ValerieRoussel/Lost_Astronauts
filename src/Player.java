@@ -20,17 +20,22 @@ public class Player extends Obj {
     private int respawnX;
     private int respawnY;
 
+    boolean lastDirection;
     boolean to_left;
     boolean to_right;
     boolean to_jump;
+    boolean to_shoot;
 
     private Image idleL;
     private Image idleR;
+    private Image[] walkL;
+    private Image[] walkR;
 
     public Player(int x, int y, int width, int height, int playerNum) {
         super(x, y, width, height, "sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png");
         this.grounded = true;
         this.alive = true;
+        lastDirection = true;
         to_left = false;
         to_right = false;
         to_jump = false;
@@ -40,6 +45,8 @@ public class Player extends Obj {
 
         idleL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleLeft.png").getImage();
         idleR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png").getImage();
+        walkL = loadAnim(8, "sprites/p" + playerNum + "/walkLeft/P" + playerNum + "_walkLeft");
+        walkR = loadAnim(8, "sprites/p" + playerNum + "/walkRight/P" + playerNum + "_walkRight");
 
     }
 
@@ -213,13 +220,13 @@ public class Player extends Obj {
 
        if (dx < 0 || (to_left && !to_right)) {
            if (grounded) {
-               if (animFrame == 29) {
+               if (animFrame == 23) {
                    animFrame = 0;
                } else {
                    animFrame++;
                }
-               img = idleL;
-               //img = leftWalk[animFrame / 3];
+               img = walkL[animFrame / 3];
+               lastDirection = false;
            }
            xChange = (int)Math.ceil(dx);
            if (frameNum % 4 < ((dx - Math.ceil(dx)) * -4)) {
@@ -227,19 +234,24 @@ public class Player extends Obj {
            }
        } else if (dx > 0  || (!to_left && to_right)) {
            if (grounded) {
-               if (animFrame == 29) {
+               if (animFrame == 23) {
                    animFrame = 0;
                } else {
                    animFrame++;
                }
-               img = idleR;
-               //img = rightWalk[animFrame / 3];
+               lastDirection = true;
+               img = walkR[animFrame / 3];
            }
            xChange = (int)Math.floor(dx);
            if (frameNum % 4 < ((dx - Math.floor(dx)) * 4)) {
                xChange++;
            }
        } else {
+           if (lastDirection) {
+               img = idleR;
+           } else {
+               img = idleL;
+           }
            xChange = 0;
            animFrame = 0;
        }

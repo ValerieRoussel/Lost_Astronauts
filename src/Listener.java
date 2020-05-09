@@ -19,6 +19,8 @@ public class Listener extends JFrame implements KeyListener{
             g.p1.to_left = true;
         } else if (e.getKeyCode() == KeyEvent.VK_D) {
             g.p1.to_right = true;
+        } else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            g.p1.to_shoot = true;
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             if (jump_released) {
                 g.p1.to_jump = true;
@@ -32,6 +34,8 @@ public class Listener extends JFrame implements KeyListener{
             g.p1.to_left = false;
         } else if (e.getKeyCode() == KeyEvent.VK_D) {
             g.p1.to_right = false;
+        } else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            g.p1.to_shoot = false;
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             jump_released = true;
             g.p1.to_jump = false;
