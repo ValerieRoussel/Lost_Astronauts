@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Bullet extends Obj {
-    private int bulletSpeed = 3;
+    private int bulletSpeed = 4;
     private boolean dir;
 
     public boolean to_delete;

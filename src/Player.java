@@ -7,7 +7,7 @@ public class Player extends Obj {
     private boolean grounded;
     private boolean slidingL;
     private boolean slidingR;
-    private boolean wallJump;
+    boolean crouching;
     private double speed;
     private int fallSpeed;
     private double dx;
@@ -15,6 +15,8 @@ public class Player extends Obj {
     private int frameNum = 0;
     private int jumpFrame = 0;
     private int animFrame = 0;
+
+    private boolean wallJump;
 
     private int xChange = 0;
     private int respawnX;
@@ -24,21 +26,32 @@ public class Player extends Obj {
     boolean to_left;
     boolean to_right;
     boolean to_jump;
+    boolean to_crouch;
     boolean to_shoot;
 
     private Image idleL;
     private Image idleR;
     private Image[] walkL;
     private Image[] walkR;
+    private Image jr;
+    private Image jru;
+    private Image jrd;
+    private Image jl;
+    private Image jlu;
+    private Image jld;
+    private Image crouchL;
+    private Image crouchR;
 
     public Player(int x, int y, int width, int height, int playerNum) {
         super(x, y, width, height, "sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png");
         this.grounded = true;
+        this.crouching = false;
         this.alive = true;
         lastDirection = true;
         to_left = false;
         to_right = false;
         to_jump = false;
+        to_crouch = false;
         this.speed = 2;
         this.fallSpeed = 3;
         wallJump = false;
@@ -47,6 +60,14 @@ public class Player extends Obj {
         idleR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png").getImage();
         walkL = loadAnim(8, "sprites/p" + playerNum + "/walkLeft/P" + playerNum + "_walkLeft");
         walkR = loadAnim(8, "sprites/p" + playerNum + "/walkRight/P" + playerNum + "_walkRight");
+        jr = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jr.png").getImage();
+        jru = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jru.png").getImage();
+        jrd = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jrd.png").getImage();
+        jl = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jl.png").getImage();
+        jlu = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jlu.png").getImage();
+        jld = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jld.png").getImage();
+        crouchL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_crouchLeft.png").getImage();
+        crouchR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_crouchRight.png").getImage();
 
     }
 
@@ -71,10 +92,18 @@ public class Player extends Obj {
             x += xChange;
             slidingL = false;
             slidingR = false;
+            crouching = false;
             xCollide(wallList);
 
             if (to_jump && grounded) {
                 dy = -4;
+            } else if (to_crouch && grounded) {
+                crouching = true;
+                if (!lastDirection) {
+                    img = crouchL;
+                } else {
+                    img = crouchR;
+                }
             } else if (to_jump && slidingL) {
                 slidingL = false;
                 dy = -4;
@@ -94,7 +123,7 @@ public class Player extends Obj {
             }
             to_jump = false;
             if (!grounded) {
-                //img = getVerticalSprite();
+                img = getVerticalSprite();
             }
             y += dy;
             grounded = false;
@@ -113,32 +142,32 @@ public class Player extends Obj {
         }
     }
 
-    /*private Image getVerticalSprite() {
-        if (slidingL) {
+    private Image getVerticalSprite() {
+        /*if (slidingL) {
             return sL;
         } else if (slidingR) {
             return sR;
-        }
+        }*/
         if (dy < 0) {
-            if (dx < 0 || (to_left && !to_right)) {
-                return jumpUpLeft;
+            if (dx < 0 || (to_left && !to_right) || !lastDirection) {
+                return jlu;
             } else {
-                return jumpUpRight;
+                return jru;
             }
         } else if (dy > 0) {
-            if (dx < 0 || (to_left && !to_right)) {
-                return jumpDownLeft;
+            if (dx < 0 || (to_left && !to_right) || !lastDirection) {
+                return jld;
             } else {
-                return jumpDownRight;
+                return jrd;
             }
         } else {
-            if (dx < 0 || (to_left && !to_right)) {
-                return jumpLeft;
+            if (dx < 0 || (to_left && !to_right) || !lastDirection) {
+                return jl;
             } else {
-                return jumpRight;
+                return jr;
             }
         }
-    }*/
+    }
 
     private void die() {
         dx = 0;
@@ -202,11 +231,11 @@ public class Player extends Obj {
     }
 
    private void calcXChange() {
-       if (to_left && !to_right) {
+       if (to_left && !to_right && !crouching) {
            if (dx > speed * (-1) && frameNum % 3 == 0) {
                dx -= 0.25;
            }
-       } else if (!to_left && to_right) {
+       } else if (!to_left && to_right && !crouching) {
            if (dx < speed && frameNum % 3 == 0) {
                dx += 0.25;
            }

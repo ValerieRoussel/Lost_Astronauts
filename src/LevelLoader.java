@@ -25,10 +25,6 @@ public class LevelLoader {
         String next;
         int j = 0;
 
-        char top;
-        char[] mid = new char[3];
-        char bot;
-
         inc = reader.readLine();
         next = reader.readLine();
         int levelWidth = inc.length();
@@ -36,11 +32,6 @@ public class LevelLoader {
 
             for (int i = 0; i < levelWidth && i < inc.length(); i++) {
                 if (inc.charAt(i) == 'W' || inc.charAt(i) == 'C') {
-                    top = prev.charAt(i);
-                    mid[0] = inc.charAt(i - 1);
-                    mid[1] = inc.charAt(i);
-                    mid[2] = inc.charAt(i + 1);
-                    bot = next.charAt(i);
                     walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
                 } else if (inc.charAt(i) == 'P') {
                     p1.setPosition(i * 16, j * 16);

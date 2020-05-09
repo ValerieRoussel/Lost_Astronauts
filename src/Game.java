@@ -64,10 +64,14 @@ public class Game extends JPanel {
             }
             if (p1.to_shoot && can_shoot) {
                 can_shoot = false;
+                int yLoc = 8;
+                if (p1.crouching) {
+                    yLoc++;
+                }
                 if (p1.lastDirection) {
-                    bulletList.add(new Bullet(p1.x + 16, p1.y + 8, 2, 1, "sprites/bullet.png", true));
+                    bulletList.add(new Bullet(p1.x + 16, p1.y + yLoc, 2, 1, "sprites/bullet.png", true));
                 } else {
-                    bulletList.add(new Bullet(p1.x - 2, p1.y + 8, 2, 1, "sprites/bullet.png", false));
+                    bulletList.add(new Bullet(p1.x - 2, p1.y + yLoc, 2, 1, "sprites/bullet.png", false));
                 }
             }
             cam1.reposition(p1, levelWidth * 16, levelHeight * 16);
