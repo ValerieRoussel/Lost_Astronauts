@@ -10,7 +10,10 @@ public class Game extends JPanel {
 
     private String world = "levels/level1.txt";
 
+
     Player p1;
+    Player p2;
+    Player currPlayer;
     private Camera cam1;
     private LevelLoader l1;
     private ArrayList<Obj> wallList;
@@ -21,12 +24,13 @@ public class Game extends JPanel {
         wallList = new ArrayList<Obj>();
         stuffList = new ArrayList<Obj>();
         bulletList = new ArrayList<Bullet>();
-        p1 = new Player(0, 0, 16, 16, 2);
+        p1 = new Player(0, 0, 16, 16, 1);
+        p2 = new Player(0, 0, 16, 16, 2);
         cam1 = new Camera();
         Dimension levelDim = new Dimension(0, 0);
         l1 = new LevelLoader();
         try {
-            levelDim = l1.loadLevel(world, wallList, stuffList, p1);
+            levelDim = l1.loadLevel(world, wallList, stuffList, p1, p2);
         } catch (IOException er) {}
         levelWidth = levelDim.width;
         levelHeight = levelDim.height;
@@ -42,9 +46,11 @@ public class Game extends JPanel {
         int rof = 30;
         int rofCounter = 0;
 
+        currPlayer = p2;
+
         while (true) {
 
-            p1.move(wallList, stuffList);
+            currPlayer.move(wallList, stuffList);
             Iterator itr = bulletList.iterator();
             while (itr.hasNext())
             {
@@ -62,19 +68,19 @@ public class Game extends JPanel {
                     rofCounter++;
                 }
             }
-            if (p1.to_shoot && can_shoot) {
+            if (currPlayer.to_shoot && can_shoot) {
                 can_shoot = false;
                 int yLoc = 8;
-                if (p1.crouching) {
+                if (currPlayer.crouching) {
                     yLoc++;
                 }
-                if (p1.lastDirection) {
-                    bulletList.add(new Bullet(p1.x + 16, p1.y + yLoc, 2, 1, "sprites/bullet.png", true));
+                if (currPlayer.lastDirection) {
+                    bulletList.add(new Bullet(currPlayer.x + 16, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", true));
                 } else {
-                    bulletList.add(new Bullet(p1.x - 2, p1.y + yLoc, 2, 1, "sprites/bullet.png", false));
+                    bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
                 }
             }
-            cam1.reposition(p1, levelWidth * 16, levelHeight * 16);
+            cam1.reposition(currPlayer, levelWidth * 16, levelHeight * 16);
             repaint();
 
             nextTick += skip;
@@ -96,11 +102,21 @@ public class Game extends JPanel {
             g.drawImage(i.img, i.x, i.y, null);
         }
         g.drawImage(p1.img, p1.x, p1.y, null);
+        g.drawImage(p2.img, p2.x, p2.y, null);
         for (Obj i : bulletList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
         for (Obj i : wallList) {
             g.drawImage(i.img, i.x, i.y, null);
+        }
+    }
+
+    public void switchPlayer() {
+        currPlayer.switchOff();
+        if (currPlayer == p1) {
+            currPlayer = p2;
+        } else {
+            currPlayer = p1;
         }
     }
 }

@@ -7,7 +7,6 @@ public class Player extends Obj {
     private boolean grounded;
     private boolean slidingL;
     private boolean slidingR;
-    boolean crouching;
     private double speed;
     private int fallSpeed;
     private double dx;
@@ -23,6 +22,7 @@ public class Player extends Obj {
     private int respawnY;
 
     boolean lastDirection;
+    boolean crouching;
     boolean to_left;
     boolean to_right;
     boolean to_jump;
@@ -169,6 +169,14 @@ public class Player extends Obj {
         }
     }
 
+    public void switchOff() {
+        to_left = false;
+        to_right = false;
+        to_crouch = false;
+        to_shoot = false;
+        to_jump = false;
+    }
+
     private void die() {
         dx = 0;
         dy = 0;
@@ -286,7 +294,7 @@ public class Player extends Obj {
            } else {
                img = idleL;
            }
-           xChange = 0;
+           xChange = (int)Math.round(dx);
            animFrame = 0;
        }
    }

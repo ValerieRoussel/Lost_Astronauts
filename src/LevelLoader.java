@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class LevelLoader {
 
-    public Dimension loadLevel(String levelPath, ArrayList<Obj> walls, ArrayList<Obj> stuff, Player p1) throws IOException {
+    public Dimension loadLevel(String levelPath, ArrayList<Obj> walls, ArrayList<Obj> stuff, Player p1, Player p2) throws IOException {
         //N = out of bounds
         //0 = nothing
         //C = outer walls
@@ -33,10 +33,13 @@ public class LevelLoader {
             for (int i = 0; i < levelWidth && i < inc.length(); i++) {
                 if (inc.charAt(i) == 'W' || inc.charAt(i) == 'C') {
                     walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
-                } else if (inc.charAt(i) == 'P') {
+                } else if (inc.charAt(i) == '1') {
                     p1.setPosition(i * 16, j * 16);
+                } else if (inc.charAt(i) == '2') {
+                    p2.setPosition(i * 16, j * 16);
                 }
             }
+
             j++;
             prev = inc;
             inc = next;
