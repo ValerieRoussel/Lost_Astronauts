@@ -128,14 +128,14 @@ public class Game extends JPanel implements MouseListener {
         for (Obj i : stuffList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
-        g.drawImage(p1.img, p1.x, p1.y, null);
-        g.drawImage(p2.img, p2.x, p2.y, null);
         for (Obj i : bulletList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
         for (Obj i : wallList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
+        g.drawImage(p1.img, p1.x, p1.y, null);
+        g.drawImage(p2.img, p2.x, p2.y, null);
         if (inMenu) {
             tm.drawMenu(g, cam1, p1, p2);
         }

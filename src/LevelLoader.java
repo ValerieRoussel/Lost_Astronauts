@@ -32,7 +32,13 @@ public class LevelLoader {
 
             for (int i = 0; i < levelWidth && i < inc.length(); i++) {
                 if (inc.charAt(i) == 'W' || inc.charAt(i) == 'C') {
-                    walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
+                    if (prev != null && prev.charAt(i) != 'W' && prev.charAt(i) != 'C') {
+                        Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_floor.png");
+                        newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
+                        walls.add(newWall);
+                    } else {
+                        walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
+                    }
                 } else if (inc.charAt(i) == '1') {
                     p1.setPosition(i * 16, j * 16);
                 } else if (inc.charAt(i) == '2') {

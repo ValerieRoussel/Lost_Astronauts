@@ -227,11 +227,11 @@ public class Player extends Obj {
             if (rect.intersects(i.rect)) {
                 if (xChange > 0) {
                     dx = 0;
-                    x = i.x - width;
+                    x = i.rect.x - width;
                 }
                 if (xChange < 0) {
                     dx = 0;
-                    x = i.x + i.width;
+                    x = i.rect.x + i.width;
                 }
             }
             if (wallJump && !grounded && (new Rectangle(x-1, y, width, height)).intersects(i.rect)) {
@@ -248,11 +248,11 @@ public class Player extends Obj {
             if (rect.intersects(i.rect)) {
                 if (dy > 0) {
                     dy = 0;
-                    y = i.y - height;
+                    y = i.rect.y - height;
                 }
                 if (dy < 0) {
                     dy = 0;
-                    y = i.y + i.height;
+                    y = i.rect.y + i.rect.height;
                 }
             }
             if (!grounded && (new Rectangle(x, y + 1, width, height)).intersects(i.rect)) {
