@@ -37,11 +37,7 @@ public class Listener extends JFrame implements KeyListener{
             }
         } else if (e.getKeyCode() == KeyEvent.VK_F) {
             if (menu_released) {
-                if (g.inMenu) {
-                    g.inMenu = false;
-                } else {
-                    g.inMenu = true;
-                }
+                g.switchMenu();
                 menu_released = false;
             }
         }

@@ -1,10 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Game extends JPanel {
+public class Game extends JPanel implements MouseListener {
     private int levelWidth;
     private int levelHeight;
 
@@ -29,7 +31,6 @@ public class Game extends JPanel {
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
-
         cam1 = new Camera();
         tm = new TradeMenu();
         this.ui = ui;
@@ -41,6 +42,7 @@ public class Game extends JPanel {
         } catch (IOException er) {}
         levelWidth = levelDim.width;
         levelHeight = levelDim.height;
+        this.addMouseListener(this);
     }
 
     public void run() {
@@ -135,4 +137,33 @@ public class Game extends JPanel {
             currPlayer = p1;
         }
     }
+
+    public void switchMenu() {
+        if (inMenu) {
+            inMenu = false;
+        } else if (p1.connected && p2.connected) {
+            inMenu = true;
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (inMenu) {
+            int mouseX = (int)Math.floor(e.getX() / 4);
+            int mouseY = (int)Math.floor(e.getY() / 4);
+            tm.trade(mouseX, mouseY, p1, p2);
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
 }

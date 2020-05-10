@@ -5,6 +5,7 @@ public class TradeMenu {
     String path = "sprites/upgrades/";
     Image p1_frame = new ImageIcon(path + "P1_tradeFrame.png").getImage();
     Image p2_frame = new ImageIcon(path + "P2_tradeFrame.png").getImage();
+    Image instruct = new ImageIcon(path + "instruct.png").getImage();
 
     Coord[] upgradeSlots = {
             new Coord(4, 4),
@@ -25,6 +26,7 @@ public class TradeMenu {
         g.fillRect(-cam.camX, -cam.camY, 200, 132);
         g.drawImage(p1_frame, p1_frameX, frameY, null);
         g.drawImage(p2_frame, p2_frameX, frameY, null);
+        g.drawImage(instruct, p1_frameX + 68, frameY + 28, null);
 
         for (int i = 0; i < p1.inventory.size(); i++) {
             g.drawImage(p1.inventory.get(i).largeIcon, p1_frameX + upgradeSlots[i].x, frameY + upgradeSlots[i].y, null);
@@ -32,6 +34,40 @@ public class TradeMenu {
         for (int i = 0; i < p2.inventory.size(); i++) {
             g.drawImage(p2.inventory.get(i).largeIcon, p2_frameX + upgradeSlots[i].x, frameY + upgradeSlots[i].y, null);
         }
+    }
+
+    public void trade(int x, int y, Player p1, Player p2) {
+        Player giver = p1;
+        Player taker = p2;
+        if (x > 100) {
+            x -= 104;
+            giver = p2;
+            taker = p1;
+        }
+        int index = 6;
+        if (x >= 20 && x < 46) {
+            if (y >= 16 && y < 42) {
+                index = 0;
+            } else if (y >= 47 && y < 73) {
+                index = 2;
+            } else if (y >= 78 && y < 104) {
+                index = 4;
+            }
+        } else if (x >= 50 && x < 76) {
+            if (y >= 16 && y < 42) {
+                index = 1;
+            } else if (y >= 47 && y < 73) {
+                index = 3;
+            } else if (y >= 78 && y < 104) {
+                index = 5;
+            }
+        }
+        if (giver.inventory.size() > index) {
+            Upgrade item = giver.inventory.get(index);
+            giver.inventory.remove(item);
+            taker.inventory.add(item);
+        }
+
     }
 
 }
