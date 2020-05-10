@@ -15,8 +15,6 @@ public class Player extends Obj {
     private int jumpFrame = 0;
     private int animFrame = 0;
 
-    private boolean wallJump;
-
     private int xChange = 0;
     private int respawnX;
     private int respawnY;
@@ -33,6 +31,8 @@ public class Player extends Obj {
     int hp;
     boolean connected;
     ArrayList<Upgrade> inventory;
+
+    private boolean wallJump;
 
     private Image idleL;
     private Image idleR;
@@ -79,6 +79,7 @@ public class Player extends Obj {
         crouchL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_crouchLeft.png").getImage();
         crouchR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_crouchRight.png").getImage();
 
+        resetUpgrades();
     }
 
     public void setPosition(int x, int y) {
@@ -94,7 +95,7 @@ public class Player extends Obj {
         this.respawnY = y;
     }
 
-    public void move(ArrayList<Obj> wallList, ArrayList<Obj> stuffList) {
+    public void move(ArrayList<Obj> wallList, ArrayList<Obj> stuffList, SoundManager sm) {
         stuffCollide(stuffList);
         if (alive) {
             frameNum++;
@@ -106,6 +107,7 @@ public class Player extends Obj {
             xCollide(wallList);
 
             if (to_jump && grounded) {
+                sm.playSound(sm.jump);
                 dy = -4;
             } else if (to_crouch && grounded) {
                 crouching = true;
@@ -115,10 +117,12 @@ public class Player extends Obj {
                     img = crouchR;
                 }
             } else if (to_jump && slidingL) {
+                sm.playSound(sm.jump);
                 slidingL = false;
                 dy = -4;
                 dx = speed;
             } else if (to_jump && slidingR) {
+                sm.playSound(sm.jump);
                 slidingR = false;
                 dy = -4;
                 dx = -speed;
@@ -175,6 +179,16 @@ public class Player extends Obj {
                 return jl;
             } else {
                 return jr;
+            }
+        }
+    }
+
+    public void resetUpgrades() {
+        wallJump = false;
+        for (int i = 0; i < inventory.size(); i++) {
+            int num = inventory.get(i).upgradeNum;
+            if (num == 0) {
+                wallJump = true;
             }
         }
     }

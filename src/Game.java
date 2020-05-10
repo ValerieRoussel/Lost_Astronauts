@@ -1,8 +1,13 @@
+import com.sun.tools.javac.Main;
+
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -20,6 +25,7 @@ public class Game extends JPanel implements MouseListener {
     private Camera cam1;
     private TradeMenu tm;
     private UI ui;
+    private SoundManager sm;
     private LevelLoader l1;
     private ArrayList<Obj> wallList;
     private ArrayList<Obj> stuffList;
@@ -31,9 +37,14 @@ public class Game extends JPanel implements MouseListener {
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
+
+        p1.inventory.add(new Upgrade(0));
+        p1.resetUpgrades();
+
         cam1 = new Camera();
         tm = new TradeMenu();
         this.ui = ui;
+        sm = new SoundManager();
         inMenu = false;
         Dimension levelDim = new Dimension(0, 0);
         l1 = new LevelLoader();
@@ -56,11 +67,12 @@ public class Game extends JPanel implements MouseListener {
         int rofCounter = 0;
 
         currPlayer = p2;
+        ui.updateUI(currPlayer, p1, p2);
 
         while (true) {
 
             if (!inMenu) {
-                currPlayer.move(wallList, stuffList);
+                currPlayer.move(wallList, stuffList, sm);
                 Iterator itr = bulletList.iterator();
                 while (itr.hasNext()) {
                     Bullet i = (Bullet) itr.next();
@@ -88,12 +100,12 @@ public class Game extends JPanel implements MouseListener {
                     } else {
                         bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
                     }
+                    sm.playSound(sm.shoot);
                 }
                 cam1.reposition(currPlayer, levelWidth * 16, levelHeight * 16);
             } else {
                 currPlayer.switchOff();
             }
-            ui.updateUI(currPlayer, p1, p2);
 
             repaint();
             ui.repaint();
@@ -136,10 +148,14 @@ public class Game extends JPanel implements MouseListener {
         } else {
             currPlayer = p1;
         }
+        ui.updateUI(currPlayer, p1, p2);
     }
 
     public void switchMenu() {
         if (inMenu) {
+            ui.updateUI(currPlayer, p1, p2);
+            p1.resetUpgrades();
+            p2.resetUpgrades();
             inMenu = false;
         } else if (p1.connected && p2.connected) {
             inMenu = true;
