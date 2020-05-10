@@ -14,7 +14,9 @@ public class Game extends JPanel {
     Player p1;
     Player p2;
     Player currPlayer;
+    boolean inMenu;
     private Camera cam1;
+    private TradeMenu tm;
     private UI ui;
     private LevelLoader l1;
     private ArrayList<Obj> wallList;
@@ -27,8 +29,11 @@ public class Game extends JPanel {
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
+
         cam1 = new Camera();
+        tm = new TradeMenu();
         this.ui = ui;
+        inMenu = false;
         Dimension levelDim = new Dimension(0, 0);
         l1 = new LevelLoader();
         try {
@@ -52,37 +57,40 @@ public class Game extends JPanel {
 
         while (true) {
 
-            currPlayer.move(wallList, stuffList);
-            Iterator itr = bulletList.iterator();
-            while (itr.hasNext())
-            {
-                Bullet i = (Bullet)itr.next();
-                i.move(wallList, cam1);
-                if (i.to_delete) {
-                    itr.remove();
+            if (!inMenu) {
+                currPlayer.move(wallList, stuffList);
+                Iterator itr = bulletList.iterator();
+                while (itr.hasNext()) {
+                    Bullet i = (Bullet) itr.next();
+                    i.move(wallList, cam1);
+                    if (i.to_delete) {
+                        itr.remove();
+                    }
                 }
+                if (!can_shoot) {
+                    if (rofCounter >= rof) {
+                        can_shoot = true;
+                        rofCounter = 0;
+                    } else {
+                        rofCounter++;
+                    }
+                }
+                if (currPlayer.to_shoot && can_shoot) {
+                    can_shoot = false;
+                    int yLoc = 8;
+                    if (currPlayer.crouching) {
+                        yLoc++;
+                    }
+                    if (currPlayer.lastDirection) {
+                        bulletList.add(new Bullet(currPlayer.x + 16, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", true));
+                    } else {
+                        bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
+                    }
+                }
+                cam1.reposition(currPlayer, levelWidth * 16, levelHeight * 16);
+            } else {
+                currPlayer.switchOff();
             }
-            if (!can_shoot) {
-                if (rofCounter >= rof) {
-                    can_shoot = true;
-                    rofCounter = 0;
-                } else {
-                    rofCounter++;
-                }
-            }
-            if (currPlayer.to_shoot && can_shoot) {
-                can_shoot = false;
-                int yLoc = 8;
-                if (currPlayer.crouching) {
-                    yLoc++;
-                }
-                if (currPlayer.lastDirection) {
-                    bulletList.add(new Bullet(currPlayer.x + 16, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", true));
-                } else {
-                    bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
-                }
-            }
-            cam1.reposition(currPlayer, levelWidth * 16, levelHeight * 16);
             ui.updateUI(currPlayer, p1, p2);
 
             repaint();
@@ -101,7 +109,7 @@ public class Game extends JPanel {
     public void paint(Graphics g) {
         ((Graphics2D)g).scale(4, 4);
         g.translate(cam1.camX, cam1.camY);
-        g.setColor(Color.DARK_GRAY);
+        g.setColor(Color.BLUE);
         g.fillRect(0, 0, levelWidth * 16, levelHeight * 16);
         for (Obj i : stuffList) {
             g.drawImage(i.img, i.x, i.y, null);
@@ -113,6 +121,9 @@ public class Game extends JPanel {
         }
         for (Obj i : wallList) {
             g.drawImage(i.img, i.x, i.y, null);
+        }
+        if (inMenu) {
+            tm.drawMenu(g, cam1, p1, p2);
         }
     }
 

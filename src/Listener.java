@@ -6,6 +6,7 @@ public class Listener extends JFrame implements KeyListener{
     Game g;
     boolean jump_released = true;
     boolean switch_released = true;
+    boolean menu_released = true;
 
     public Listener(Game g) {
         this.g = g;
@@ -34,6 +35,15 @@ public class Listener extends JFrame implements KeyListener{
                 g.switchPlayer();
                 switch_released = false;
             }
+        } else if (e.getKeyCode() == KeyEvent.VK_F) {
+            if (menu_released) {
+                if (g.inMenu) {
+                    g.inMenu = false;
+                } else {
+                    g.inMenu = true;
+                }
+                menu_released = false;
+            }
         }
     }
     
@@ -51,6 +61,8 @@ public class Listener extends JFrame implements KeyListener{
             g.currPlayer.to_jump = false;
         } else if (e.getKeyCode() == KeyEvent.VK_R) {
             switch_released = true;
+        } else if (e.getKeyCode() == KeyEvent.VK_F) {
+            menu_released = true;
         }
     }
 }

@@ -32,6 +32,7 @@ public class Player extends Obj {
     int playerNum;
     int hp;
     boolean connected;
+    ArrayList<Upgrade> inventory;
 
     private Image idleL;
     private Image idleR;
@@ -63,6 +64,7 @@ public class Player extends Obj {
         this.playerNum = playerNum;
         hp = 1;
         connected = true;
+        inventory = new ArrayList<Upgrade>();
 
         idleL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleLeft.png").getImage();
         idleR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png").getImage();
