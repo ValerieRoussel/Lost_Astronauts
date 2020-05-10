@@ -15,8 +15,6 @@ public class Game extends JPanel implements MouseListener {
     private int levelWidth;
     private int levelHeight;
 
-    private String world = "levels/level1.txt";
-
 
     Player p1;
     Player p2;
@@ -32,12 +30,11 @@ public class Game extends JPanel implements MouseListener {
     private ArrayList<Bullet> bulletList;
 
     public Game(UI ui) {
-        wallList = new ArrayList<Obj>();
-        stuffList = new ArrayList<Obj>();
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
 
+        //TODO delete this
         p1.inventory.add(new Upgrade(0));
         p1.resetUpgrades();
 
@@ -46,13 +43,14 @@ public class Game extends JPanel implements MouseListener {
         this.ui = ui;
         sm = new SoundManager();
         inMenu = false;
-        Dimension levelDim = new Dimension(0, 0);
+        currPlayer = p2;
+        ui.updateUI(currPlayer, p1, p2);
+
         l1 = new LevelLoader();
-        try {
-            levelDim = l1.loadLevel(world, wallList, stuffList, p1, p2);
-        } catch (IOException er) {}
-        levelWidth = levelDim.width;
-        levelHeight = levelDim.height;
+
+        enterRoom(p1, 'A');
+        enterRoom(p2, 'A');
+
         this.addMouseListener(this);
     }
 
@@ -66,12 +64,12 @@ public class Game extends JPanel implements MouseListener {
         int rof = 30;
         int rofCounter = 0;
 
-        currPlayer = p2;
-        ui.updateUI(currPlayer, p1, p2);
-
         while (true) {
 
             if (!inMenu) {
+                if (currPlayer.oob && currPlayer.nextRoomCode != null) {
+                    enterRoom(currPlayer, currPlayer.nextRoomCode);
+                }
                 currPlayer.move(wallList, stuffList, sm);
                 Iterator itr = bulletList.iterator();
                 while (itr.hasNext()) {
@@ -123,7 +121,7 @@ public class Game extends JPanel implements MouseListener {
     public void paint(Graphics g) {
         ((Graphics2D)g).scale(4, 4);
         g.translate(cam1.camX, cam1.camY);
-        g.setColor(Color.BLUE);
+        g.setColor(Color.decode("#d1a259"));
         g.fillRect(0, 0, levelWidth * 16, levelHeight * 16);
         for (Obj i : stuffList) {
             g.drawImage(i.img, i.x, i.y, null);
@@ -134,21 +132,88 @@ public class Game extends JPanel implements MouseListener {
         for (Obj i : wallList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
-        g.drawImage(p1.img, p1.x, p1.y, null);
-        g.drawImage(p2.img, p2.x, p2.y, null);
+        g.drawImage(currPlayer.img, currPlayer.x, currPlayer.y, null);
         if (inMenu) {
             tm.drawMenu(g, cam1, p1, p2);
         }
     }
 
-    public void switchPlayer() {
-        currPlayer.switchOff();
-        if (currPlayer == p1) {
-            currPlayer = p2;
-        } else {
-            currPlayer = p1;
+    public void switchRoom(Room newRoom){
+        currPlayer.setPosition(newRoom.pStartPos.x, newRoom.pStartPos.y);
+        wallList = newRoom.wallList;
+        stuffList = newRoom.stuffList;
+        bulletList.clear();
+        levelWidth = newRoom.levelDim.width;
+        levelHeight = newRoom.levelDim.height;
+    }
+
+    public void enterRoom(Player p, char newRoomCode) {
+        char lastCode = '?';
+        if (p.currRoom != null) {
+            lastCode = p.currRoom.code;
         }
-        ui.updateUI(currPlayer, p1, p2);
+
+        Iterator itr = p.roomList.iterator();
+        while (itr.hasNext()) {
+            Room i = (Room) itr.next();
+            if (i.code != lastCode && i.code != newRoomCode) {
+                itr.remove();
+            } else if (i.code == newRoomCode) {
+                p.currRoom = i;
+            }
+        }
+
+        if (p.currRoom == null) {
+            if (p == p1) {
+                p.roomList.add(p.currRoom = new Room(false, newRoomCode, l1));
+            } else {
+                p.roomList.add(p.currRoom = new Room(true, newRoomCode, l1));
+            }
+        }
+
+        for (char i : p.currRoom.neighbors) {
+            if (i != lastCode)
+                if (p == p1) {
+                    p.roomList.add(new Room(false, i, l1));
+                } else {
+                    p.roomList.add(new Room(true, i, l1));
+                }
+        }
+
+        for (Obj i : p.currRoom.stuffList) {
+            if (i instanceof Door && ((Door) i).nextRoomCode == lastCode) {
+                if (((Door) i).vertical) {
+                    p.currRoom.pStartPos.x = i.x;
+                    p.currRoom.pStartPos.y = i.y + 18;
+                } else {
+                    p.currRoom.pStartPos.x = i.x + 8;
+                    p.currRoom.pStartPos.y = i.y;
+                }
+                break;
+            }
+        }
+
+        p.nextRoomCode = null;
+        if (currPlayer == p) {
+            switchRoom(currPlayer.currRoom);
+        }
+    }
+
+    public void switchPlayer() {
+        if (!inMenu) {
+            currPlayer.switchOff();
+            if (currPlayer == p1) {
+                p1.currRoom.pStartPos.x = p1.x;
+                p1.currRoom.pStartPos.y = p1.y;
+                currPlayer = p2;
+            } else {
+                p2.currRoom.pStartPos.x = p2.x;
+                p2.currRoom.pStartPos.y = p2.y;
+                currPlayer = p1;
+            }
+            switchRoom(currPlayer.currRoom);
+            ui.updateUI(currPlayer, p1, p2);
+        }
     }
 
     public void switchMenu() {

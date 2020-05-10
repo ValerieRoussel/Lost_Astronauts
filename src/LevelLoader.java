@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class LevelLoader {
 
-    public Dimension loadLevel(String levelPath, ArrayList<Obj> walls, ArrayList<Obj> stuff, Player p1, Player p2) throws IOException {
+    public Dimension loadLevel(String levelPath, ArrayList<Obj> walls, ArrayList<Obj> stuff, ArrayList<Character> neighbors, Coord pLoc) throws IOException {
         //0 = nothing
         //C = outer walls
         //W = inner walls
@@ -29,18 +29,20 @@ public class LevelLoader {
         while (inc != null) {
 
             for (int i = 0; i < levelWidth && i < inc.length(); i++) {
-                if (inc.charAt(i) == 'W' || inc.charAt(i) == 'C') {
-                    if (prev != null && prev.charAt(i) != 'W' && prev.charAt(i) != 'C') {
+                if (inc.charAt(i) == 'w') {
+                    if (prev != null && prev.charAt(i) != 'w') {
                         Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_floor.png");
                         newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
                         walls.add(newWall);
                     } else {
                         walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
                     }
-                } else if (inc.charAt(i) == '1') {
-                    p1.setPosition(i * 16, (j * 16) + 2);
-                } else if (inc.charAt(i) == '2') {
-                    p2.setPosition(i * 16, (j * 16) + 2);
+                } else if (inc.charAt(i) == 'p') {
+                    pLoc.x = i * 16;
+                    pLoc.y = (j * 16) + 2;
+                } else if (Character.isUpperCase(inc.charAt(i))) {
+                    neighbors.add(inc.charAt(i));
+                    stuff.add(new Door(i * 16, j * 16, 16, 32, "", (prev != null && next != null), inc.charAt(i)));
                 }
             }
 

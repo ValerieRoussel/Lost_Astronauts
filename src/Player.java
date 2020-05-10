@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Player extends Obj {
     private boolean alive;
@@ -32,6 +33,11 @@ public class Player extends Obj {
     boolean connected;
     ArrayList<Upgrade> inventory;
 
+    Room currRoom;
+    boolean oob;
+    Character nextRoomCode;
+    ArrayList<Room> roomList;
+
     private boolean wallJump;
 
     private Image idleL;
@@ -61,10 +67,14 @@ public class Player extends Obj {
         this.fallSpeed = 3;
         wallJump = false;
 
+        currRoom = null;
+        nextRoomCode = null;
+        oob = false;
         this.playerNum = playerNum;
         hp = (3 - playerNum) * 50;
         connected = true;
         inventory = new ArrayList<Upgrade>();
+        roomList = new ArrayList<Room>();
 
         idleL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleLeft.png").getImage();
         idleR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_idleRight.png").getImage();
@@ -146,6 +156,7 @@ public class Player extends Obj {
             if (frameNum == 60) {
                 frameNum = 0;
             }
+            checkOOB();
         } else {
             if (frameNum >= 30) {
                 x = respawnX;
@@ -154,6 +165,10 @@ public class Player extends Obj {
             }
             frameNum++;
         }
+    }
+
+    private void checkOOB() {
+        oob = (x < -16 || y < -16 || x > currRoom.levelDim.width * 16 || y > currRoom.levelDim.width * 16);
     }
 
     private Image getVerticalSprite() {
@@ -212,10 +227,11 @@ public class Player extends Obj {
     private void stuffCollide(ArrayList<Obj> stuffList) {
         if (alive) {
             updateRect();
-            Rectangle hurtRect = new Rectangle(x + 4, y + 4, 4, 4);
             for (Obj i : stuffList) {
-                if (hurtRect.intersects(i.rect)) {
-                    //TODO collide with objects
+                if (rect.intersects(i.rect)) {
+                    if (i instanceof Door) {
+                        nextRoomCode = ((Door) i).nextRoomCode;
+                    }
                 }
             }
         }
