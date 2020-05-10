@@ -231,6 +231,12 @@ public class Player extends Obj {
                 if (rect.intersects(i.rect)) {
                     if (i instanceof Door) {
                         nextRoomCode = ((Door) i).nextRoomCode;
+                        return;
+                    } else if (i instanceof UpgradePickup) {
+                        inventory.add(new Upgrade(((UpgradePickup) i).num));
+                        stuffList.remove(i);
+                        resetUpgrades();
+                        return;
                     }
                 }
             }

@@ -34,19 +34,12 @@ public class Game extends JPanel implements MouseListener {
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
-
-        //TODO delete this
-        p1.inventory.add(new Upgrade(0));
-        p1.resetUpgrades();
-
         cam1 = new Camera();
         tm = new TradeMenu();
         this.ui = ui;
         sm = new SoundManager();
         inMenu = false;
-        currPlayer = p2;
-        ui.updateUI(currPlayer, p1, p2);
-
+        currPlayer = p1;
         l1 = new LevelLoader();
 
         enterRoom(p1, 'A');
@@ -54,6 +47,7 @@ public class Game extends JPanel implements MouseListener {
 
         blueSwitch = false;
 
+        ui.updateUI(currPlayer, p1, p2);
         this.addMouseListener(this);
     }
 
@@ -151,6 +145,7 @@ public class Game extends JPanel implements MouseListener {
         stuffList = newRoom.stuffList;
         bulletList.clear();
         updateSwitchWalls();
+        currPlayer.connected = currPlayer.currRoom.connected;
         levelWidth = newRoom.levelDim.width;
         levelHeight = newRoom.levelDim.height;
     }
@@ -194,8 +189,17 @@ public class Game extends JPanel implements MouseListener {
                     p.currRoom.pStartPos.x = i.x;
                     p.currRoom.pStartPos.y = i.y + 18;
                 } else {
-                    p.currRoom.pStartPos.x = i.x + 8;
-                    p.currRoom.pStartPos.y = i.y;
+                    if (i.y == 0) {
+                        p.currRoom.pStartPos.x = i.x + 8;
+                        p.currRoom.pStartPos.y = i.y;
+                    } else {
+                        if (p.to_left) {
+                            p.currRoom.pStartPos.x = i.x -16;
+                        } else {
+                            p.currRoom.pStartPos.x = i.x + 32;
+                        }
+                        p.currRoom.pStartPos.y = i.y - 16;
+                    }
                 }
                 break;
             }

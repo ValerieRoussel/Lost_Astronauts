@@ -52,6 +52,8 @@ public class LevelLoader {
                 } else if (Character.isUpperCase(inc.charAt(i))) {
                     neighbors.add(inc.charAt(i));
                     stuff.add(new Door(i * 16, j * 16, 16, 32, "", (prev != null && next != null), inc.charAt(i)));
+                } else if (inc.charAt(i) != '0' && Character.isDigit(inc.charAt(i))) {
+                    stuff.add(new UpgradePickup((i * 16) + 3, (j * 16) + 3, 10, 10, "", Character.getNumericValue(inc.charAt(i)) - 1));
                 }
             }
 

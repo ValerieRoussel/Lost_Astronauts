@@ -28,10 +28,10 @@ public class TradeMenu {
         g.drawImage(p2_frame, p2_frameX, frameY, null);
         g.drawImage(instruct, p1_frameX + 68, frameY + 28, null);
 
-        for (int i = 0; i < p1.inventory.size(); i++) {
+        for (int i = 0; i < p1.inventory.size() && i < upgradeSlots.length; i++) {
             g.drawImage(p1.inventory.get(i).largeIcon, p1_frameX + upgradeSlots[i].x, frameY + upgradeSlots[i].y, null);
         }
-        for (int i = 0; i < p2.inventory.size(); i++) {
+        for (int i = 0; i < p2.inventory.size() && i < upgradeSlots.length; i++) {
             g.drawImage(p2.inventory.get(i).largeIcon, p2_frameX + upgradeSlots[i].x, frameY + upgradeSlots[i].y, null);
         }
     }

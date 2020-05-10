@@ -30,8 +30,17 @@ public class Room {
             loadRoom("levels/world2/level" + code + ".txt", ll);
         }
 
-        connected = true;
-        backDrop = Color.decode("#d1a259");
+        if (!world) {
+            backDrop = Color.decode("#615959");
+            if (code == 'C') {
+                connected = true;
+            } else {
+                connected = false;
+            }
+        } else {
+            backDrop = Color.decode("#d1a259");
+            connected = true;
+        }
 
     }
 
