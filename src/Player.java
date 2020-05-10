@@ -62,7 +62,7 @@ public class Player extends Obj {
         wallJump = false;
 
         this.playerNum = playerNum;
-        hp = 1;
+        hp = (3 - playerNum) * 50;
         connected = true;
         inventory = new ArrayList<Upgrade>();
 
