@@ -26,6 +26,9 @@ public class Bullet extends Obj {
         for (Obj i : walls) {
             if (rect.intersects(i.rect)) {
                 to_delete = true;
+                if (i instanceof SwitchTrigger) {
+                    ((SwitchTrigger) i).activate();
+                }
                 return;
             }
         }

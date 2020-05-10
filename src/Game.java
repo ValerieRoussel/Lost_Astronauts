@@ -15,7 +15,6 @@ public class Game extends JPanel implements MouseListener {
     private int levelWidth;
     private int levelHeight;
 
-
     Player p1;
     Player p2;
     Player currPlayer;
@@ -28,6 +27,8 @@ public class Game extends JPanel implements MouseListener {
     private ArrayList<Obj> wallList;
     private ArrayList<Obj> stuffList;
     private ArrayList<Bullet> bulletList;
+
+    boolean blueSwitch;
 
     public Game(UI ui) {
         bulletList = new ArrayList<Bullet>();
@@ -51,6 +52,8 @@ public class Game extends JPanel implements MouseListener {
         enterRoom(p1, 'A');
         enterRoom(p2, 'A');
 
+        blueSwitch = false;
+
         this.addMouseListener(this);
     }
 
@@ -69,6 +72,10 @@ public class Game extends JPanel implements MouseListener {
             if (!inMenu) {
                 if (currPlayer.oob && currPlayer.nextRoomCode != null) {
                     enterRoom(currPlayer, currPlayer.nextRoomCode);
+                }
+                if (blueSwitch != SwitchTrigger.blueSwitch) {
+                    blueSwitch = SwitchTrigger.blueSwitch;
+                    updateSwitchWalls();
                 }
                 currPlayer.move(wallList, stuffList, sm);
                 Iterator itr = bulletList.iterator();
@@ -121,7 +128,7 @@ public class Game extends JPanel implements MouseListener {
     public void paint(Graphics g) {
         ((Graphics2D)g).scale(4, 4);
         g.translate(cam1.camX, cam1.camY);
-        g.setColor(Color.decode("#d1a259"));
+        g.setColor(currPlayer.currRoom.backDrop);
         g.fillRect(0, 0, levelWidth * 16, levelHeight * 16);
         for (Obj i : stuffList) {
             g.drawImage(i.img, i.x, i.y, null);
@@ -143,6 +150,7 @@ public class Game extends JPanel implements MouseListener {
         wallList = newRoom.wallList;
         stuffList = newRoom.stuffList;
         bulletList.clear();
+        updateSwitchWalls();
         levelWidth = newRoom.levelDim.width;
         levelHeight = newRoom.levelDim.height;
     }
@@ -192,10 +200,23 @@ public class Game extends JPanel implements MouseListener {
                 break;
             }
         }
+        p.connected = p.currRoom.connected;
 
         p.nextRoomCode = null;
         if (currPlayer == p) {
             switchRoom(currPlayer.currRoom);
+        }
+    }
+
+    public void updateSwitchWalls() {
+        for (Obj i : wallList) {
+            if (i instanceof SwitchWall) {
+                if (((SwitchWall) i).color == "blue" && blueSwitch != ((SwitchWall) i).on) {
+                    ((SwitchWall) i).update();
+                } else if (((SwitchWall) i).color == "red" && blueSwitch == ((SwitchWall) i).on) {
+                    ((SwitchWall) i).update();
+                }
+            }
         }
     }
 

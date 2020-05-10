@@ -168,7 +168,7 @@ public class Player extends Obj {
     }
 
     private void checkOOB() {
-        oob = (x < -16 || y < -16 || x > currRoom.levelDim.width * 16 || y > currRoom.levelDim.width * 16);
+        oob = (x < -16 || y < -16 || x > currRoom.levelDim.width * 16 || y > currRoom.levelDim.height * 16);
     }
 
     private Image getVerticalSprite() {
@@ -240,6 +240,9 @@ public class Player extends Obj {
    private void xCollide(ArrayList<Obj> wallList) {
         updateRect();
         for (Obj i : wallList) {
+            if (i instanceof SwitchWall && !(((SwitchWall) i).on)) {
+                continue;
+            }
             if (rect.intersects(i.rect)) {
                 if (xChange > 0) {
                     dx = 0;
@@ -261,6 +264,9 @@ public class Player extends Obj {
     private void yCollide(ArrayList<Obj> wallList) {
         updateRect();
         for (Obj i : wallList) {
+            if (i instanceof SwitchWall && !(((SwitchWall) i).on)) {
+                continue;
+            }
             if (rect.intersects(i.rect)) {
                 if (dy > 0) {
                     dy = 0;

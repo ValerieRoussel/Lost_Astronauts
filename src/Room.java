@@ -7,6 +7,9 @@ public class Room {
     //false = space station (Player 1)
     //true = planet (Player 2)
 
+    boolean connected;
+    Color backDrop;
+
     char code;
     Dimension levelDim;
     Coord pStartPos;
@@ -26,6 +29,10 @@ public class Room {
         } else {
             loadRoom("levels/world2/level" + code + ".txt", ll);
         }
+
+        connected = true;
+        backDrop = Color.decode("#d1a259");
+
     }
 
     public void loadRoom(String path, LevelLoader ll) {
