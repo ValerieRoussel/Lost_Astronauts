@@ -7,10 +7,26 @@ import java.net.URL;
 public class SoundManager {
     URL shoot;
     URL jump;
+    URL click;
+    URL click2;
+    URL swoosh;
+    URL collect;
+    URL good;
+    URL land;
+    URL step1;
+    URL step2;
 
     public SoundManager() {
         shoot = loadSound("shoot.wav");
         jump = loadSound("jump.wav");
+        click = loadSound("click.wav");
+        click2 = loadSound("click2.wav");
+        swoosh = loadSound("swoosh.wav");
+        collect = loadSound("collect.wav");
+        good = loadSound("good.wav");
+        land = loadSound("land.wav");
+        step1 = loadSound("step1.wav");
+        step2 = loadSound("step2.wav");
     }
 
     public URL loadSound(String soundFile) {

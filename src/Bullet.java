@@ -12,7 +12,7 @@ public class Bullet extends Obj {
         to_delete = false;
     }
 
-    public void move(ArrayList<Obj> walls, Camera cam) {
+    public void move(ArrayList<Obj> walls, Camera cam, SoundManager sm) {
         if (dir) {
             this.x += bulletSpeed;
         } else {
@@ -28,6 +28,7 @@ public class Bullet extends Obj {
                 to_delete = true;
                 if (i instanceof SwitchTrigger) {
                     ((SwitchTrigger) i).activate();
+                    sm.playSound(sm.click);
                 }
                 return;
             }

@@ -9,6 +9,7 @@ public class Room {
 
     boolean connected;
     Color backDrop;
+    int tileSet;
 
     char code;
     Dimension levelDim;
@@ -24,29 +25,37 @@ public class Room {
         wallList = new ArrayList<Obj>();
         stuffList = new ArrayList<Obj>();
         neighbors = new ArrayList<Character>();
-        if (!world) {
-            loadRoom("levels/world1/level" + code + ".txt", ll);
-        } else {
-            loadRoom("levels/world2/level" + code + ".txt", ll);
-        }
 
         if (!world) {
-            backDrop = Color.decode("#615959");
+            backDrop = Color.decode("#8b94a7");
+            tileSet = 1;
             if (code == 'C') {
                 connected = true;
             } else {
                 connected = false;
             }
         } else {
-            backDrop = Color.decode("#d1a259");
-            connected = true;
+            tileSet = 0;
+            if (code == 'D') {
+                backDrop = Color.decode("#c0e5be");
+                connected = true;
+            } else {
+                backDrop = Color.decode("#352317");
+                connected = false;
+            }
+        }
+
+        if (!world) {
+            loadRoom("levels/world1/level" + code + ".txt", ll);
+        } else {
+            loadRoom("levels/world2/level" + code + ".txt", ll);
         }
 
     }
 
     public void loadRoom(String path, LevelLoader ll) {
         try {
-            levelDim = ll.loadLevel(path, wallList, stuffList, neighbors, pStartPos);
+            levelDim = ll.loadLevel(path, wallList, stuffList, neighbors, pStartPos, tileSet);
         } catch (IOException er) {}
     }
 

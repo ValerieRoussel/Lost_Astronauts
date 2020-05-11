@@ -39,6 +39,7 @@ public class Player extends Obj {
     ArrayList<Room> roomList;
 
     private boolean wallJump;
+    private boolean highJump;
 
     private Image idleL;
     private Image idleR;
@@ -65,7 +66,9 @@ public class Player extends Obj {
         to_crouch = false;
         this.speed = 2;
         this.fallSpeed = 3;
+
         wallJump = false;
+        highJump = false;
 
         currRoom = null;
         nextRoomCode = null;
@@ -106,26 +109,32 @@ public class Player extends Obj {
     }
 
     public void move(ArrayList<Obj> wallList, ArrayList<Obj> stuffList, SoundManager sm) {
-        stuffCollide(stuffList);
+        stuffCollide(stuffList, sm);
         if (alive) {
             frameNum++;
-            calcXChange();
+            calcXChange(sm);
             x += xChange;
             slidingL = false;
             slidingR = false;
             crouching = false;
             xCollide(wallList);
 
-            if (to_jump && grounded) {
-                sm.playSound(sm.jump);
-                dy = -4;
-            } else if (to_crouch && grounded) {
+            if (to_crouch && grounded) {
                 crouching = true;
                 if (!lastDirection) {
                     img = crouchL;
                 } else {
                     img = crouchR;
                 }
+            }
+
+            if (to_jump && grounded) {
+                if (crouching && highJump) {
+                    dy = -6;
+                } else {
+                    dy = -4;
+                }
+                sm.playSound(sm.jump);
             } else if (to_jump && slidingL) {
                 sm.playSound(sm.jump);
                 slidingL = false;
@@ -151,7 +160,7 @@ public class Player extends Obj {
             }
             y += dy;
             grounded = false;
-            yCollide(wallList);
+            yCollide(wallList, sm);
 
             if (frameNum == 60) {
                 frameNum = 0;
@@ -200,10 +209,13 @@ public class Player extends Obj {
 
     public void resetUpgrades() {
         wallJump = false;
+        highJump = false;
         for (int i = 0; i < inventory.size(); i++) {
             int num = inventory.get(i).upgradeNum;
             if (num == 0) {
                 wallJump = true;
+            } else if (num == 1) {
+                highJump = true;
             }
         }
     }
@@ -224,7 +236,7 @@ public class Player extends Obj {
         alive = false;
     }
 
-    private void stuffCollide(ArrayList<Obj> stuffList) {
+    private void stuffCollide(ArrayList<Obj> stuffList, SoundManager sm) {
         if (alive) {
             updateRect();
             for (Obj i : stuffList) {
@@ -236,6 +248,7 @@ public class Player extends Obj {
                         inventory.add(new Upgrade(((UpgradePickup) i).num));
                         stuffList.remove(i);
                         resetUpgrades();
+                        sm.playSound(sm.collect);
                         return;
                     }
                 }
@@ -267,7 +280,7 @@ public class Player extends Obj {
         }
     }
 
-    private void yCollide(ArrayList<Obj> wallList) {
+    private void yCollide(ArrayList<Obj> wallList, SoundManager sm) {
         updateRect();
         for (Obj i : wallList) {
             if (i instanceof SwitchWall && !(((SwitchWall) i).on)) {
@@ -275,6 +288,9 @@ public class Player extends Obj {
             }
             if (rect.intersects(i.rect)) {
                 if (dy > 0) {
+                    if (dy == fallSpeed) {
+                        sm.playSound(sm.land);
+                    }
                     dy = 0;
                     y = i.rect.y - height;
                 }
@@ -290,7 +306,7 @@ public class Player extends Obj {
         }
     }
 
-   private void calcXChange() {
+   private void calcXChange(SoundManager sm) {
        if (to_left && !to_right && !crouching) {
            if (dx > speed * (-1) && frameNum % 3 == 0) {
                dx -= 0.25;
@@ -322,6 +338,11 @@ public class Player extends Obj {
                    animFrame++;
                }
                img = walkL[animFrame / 3];
+               if (animFrame == 0) {
+                   sm.playSound(sm.step1);
+               } else if (animFrame == 12) {
+                   sm.playSound(sm.step2);
+               }
            }
            xChange = (int)Math.ceil(dx);
            if (frameNum % 4 < ((dx - Math.ceil(dx)) * -4)) {
@@ -335,6 +356,11 @@ public class Player extends Obj {
                    animFrame++;
                }
                img = walkR[animFrame / 3];
+               if (animFrame == 0) {
+                    sm.playSound(sm.step1);
+               } else if (animFrame == 12) {
+                   sm.playSound(sm.step2);
+               }
            }
            xChange = (int)Math.floor(dx);
            if (frameNum % 4 < ((dx - Math.floor(dx)) * 4)) {

@@ -8,6 +8,7 @@ public class Upgrade {
 
     int upgradeNum;
     //0 - wall jump
+    //1 -
     //and so on
 
     public Upgrade(int num) {

@@ -36,7 +36,7 @@ public class TradeMenu {
         }
     }
 
-    public void trade(int x, int y, Player p1, Player p2) {
+    public void trade(int x, int y, Player p1, Player p2, SoundManager sm) {
         Player giver = p1;
         Player taker = p2;
         if (x > 100) {
@@ -66,6 +66,7 @@ public class TradeMenu {
             Upgrade item = giver.inventory.get(index);
             giver.inventory.remove(item);
             taker.inventory.add(item);
+            sm.playSound(sm.click2);
         }
 
     }

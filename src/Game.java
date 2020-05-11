@@ -1,13 +1,7 @@
-import com.sun.tools.javac.Main;
-
-import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -75,7 +69,7 @@ public class Game extends JPanel implements MouseListener {
                 Iterator itr = bulletList.iterator();
                 while (itr.hasNext()) {
                     Bullet i = (Bullet) itr.next();
-                    i.move(wallList, cam1);
+                    i.move(wallList, cam1, sm);
                     if (i.to_delete) {
                         itr.remove();
                     }
@@ -146,6 +140,7 @@ public class Game extends JPanel implements MouseListener {
         bulletList.clear();
         updateSwitchWalls();
         currPlayer.connected = currPlayer.currRoom.connected;
+        ui.updateUI(currPlayer, p1, p2);
         levelWidth = newRoom.levelDim.width;
         levelHeight = newRoom.levelDim.height;
     }
@@ -237,7 +232,7 @@ public class Game extends JPanel implements MouseListener {
                 currPlayer = p1;
             }
             switchRoom(currPlayer.currRoom);
-            ui.updateUI(currPlayer, p1, p2);
+            sm.playSound(sm.swoosh);
         }
     }
 
@@ -260,7 +255,7 @@ public class Game extends JPanel implements MouseListener {
         if (inMenu) {
             int mouseX = (int)Math.floor(e.getX() / 4);
             int mouseY = (int)Math.floor(e.getY() / 4);
-            tm.trade(mouseX, mouseY, p1, p2);
+            tm.trade(mouseX, mouseY, p1, p2, sm);
         }
     }
 

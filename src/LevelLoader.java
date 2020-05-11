@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class LevelLoader {
 
-    public Dimension loadLevel(String levelPath, ArrayList<Obj> walls, ArrayList<Obj> stuff, ArrayList<Character> neighbors, Coord pLoc) throws IOException {
+    public Dimension loadLevel(String levelPath, ArrayList<Obj> walls, ArrayList<Obj> stuff, ArrayList<Character> neighbors, Coord pLoc, int tileSet) throws IOException {
         //0 = nothing
         //w = walls
         //p = player
@@ -34,11 +34,22 @@ public class LevelLoader {
             for (int i = 0; i < levelWidth && i < inc.length(); i++) {
                 if (inc.charAt(i) == 'w') {
                     if (prev != null && prev.charAt(i) != 'w' && prev.charAt(i) != 'q') {
-                        Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_floor.png");
-                        newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
-                        walls.add(newWall);
+                        if (tileSet == 0) {
+                            Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_floor.png");
+                            newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
+                            walls.add(newWall);
+                        } else if (tileSet == 1) {
+                            Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/space_floor.png");
+                            newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
+                            walls.add(newWall);
+                        }
+
                     } else {
-                        walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
+                        if (tileSet == 0) {
+                            walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
+                        } else if (tileSet == 1) {
+                            walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/space_wall.png"));
+                        }
                     }
                 } else if (inc.charAt(i) == 'q') {
                     walls.add(new SwitchTrigger(i * 16, j * 16, 16, 16, "sprites/stuff/blue_trigger.png", "blue"));
