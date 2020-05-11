@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Player extends Obj {
     private boolean alive;
@@ -108,8 +107,8 @@ public class Player extends Obj {
         this.respawnY = y;
     }
 
-    public void move(ArrayList<Obj> wallList, ArrayList<Obj> stuffList, SoundManager sm) {
-        stuffCollide(stuffList, sm);
+    public void move(ArrayList<Obj> wallList, ArrayList<Obj> stuffList, SoundManager sm, boolean[] collected) {
+        stuffCollide(stuffList, sm, collected);
         if (alive) {
             frameNum++;
             calcXChange(sm);
@@ -236,7 +235,7 @@ public class Player extends Obj {
         alive = false;
     }
 
-    private void stuffCollide(ArrayList<Obj> stuffList, SoundManager sm) {
+    private void stuffCollide(ArrayList<Obj> stuffList, SoundManager sm, boolean[] collected) {
         if (alive) {
             updateRect();
             for (Obj i : stuffList) {
@@ -247,6 +246,7 @@ public class Player extends Obj {
                     } else if (i instanceof UpgradePickup) {
                         inventory.add(new Upgrade(((UpgradePickup) i).num));
                         stuffList.remove(i);
+                        collected[((UpgradePickup) i).num] = true;
                         resetUpgrades();
                         sm.playSound(sm.collect);
                         return;

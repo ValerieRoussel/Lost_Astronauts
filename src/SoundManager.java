@@ -11,7 +11,6 @@ public class SoundManager {
     URL click2;
     URL swoosh;
     URL collect;
-    URL good;
     URL land;
     URL step1;
     URL step2;
@@ -23,7 +22,6 @@ public class SoundManager {
         click2 = loadSound("click2.wav");
         swoosh = loadSound("swoosh.wav");
         collect = loadSound("collect.wav");
-        good = loadSound("good.wav");
         land = loadSound("land.wav");
         step1 = loadSound("step1.wav");
         step2 = loadSound("step2.wav");

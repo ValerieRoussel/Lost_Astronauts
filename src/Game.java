@@ -22,6 +22,7 @@ public class Game extends JPanel implements MouseListener {
     private ArrayList<Obj> stuffList;
     private ArrayList<Bullet> bulletList;
 
+    boolean[] upgradesCollected = {false, false, false, false, false, false};
     boolean blueSwitch;
 
     public Game(UI ui) {
@@ -65,7 +66,7 @@ public class Game extends JPanel implements MouseListener {
                     blueSwitch = SwitchTrigger.blueSwitch;
                     updateSwitchWalls();
                 }
-                currPlayer.move(wallList, stuffList, sm);
+                currPlayer.move(wallList, stuffList, sm, upgradesCollected);
                 Iterator itr = bulletList.iterator();
                 while (itr.hasNext()) {
                     Bullet i = (Bullet) itr.next();
@@ -172,9 +173,9 @@ public class Game extends JPanel implements MouseListener {
         for (char i : p.currRoom.neighbors) {
             if (i != lastCode)
                 if (p == p1) {
-                    p.roomList.add(new Room(false, i, l1));
+                    p.roomList.add(removeDuplicates(new Room(false, i, l1)));
                 } else {
-                    p.roomList.add(new Room(true, i, l1));
+                    p.roomList.add(removeDuplicates(new Room(true, i, l1)));
                 }
         }
 
@@ -205,6 +206,17 @@ public class Game extends JPanel implements MouseListener {
         if (currPlayer == p) {
             switchRoom(currPlayer.currRoom);
         }
+    }
+
+    public Room removeDuplicates(Room newRoom) {
+        Iterator itr = newRoom.stuffList.iterator();
+        while (itr.hasNext()) {
+            Obj i = (Obj) itr.next();
+            if (i instanceof UpgradePickup && upgradesCollected[((UpgradePickup) i).num] == true) {
+                itr.remove();
+            }
+        }
+        return newRoom;
     }
 
     public void updateSwitchWalls() {
