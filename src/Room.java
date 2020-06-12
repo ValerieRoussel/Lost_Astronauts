@@ -10,6 +10,9 @@ public class Room {
     boolean connected;
     Color backDrop;
     int tileSet;
+    //0 = planet surface
+    //1 = space station
+    //2 = planet caves
 
     char code;
     Dimension levelDim;
@@ -35,11 +38,12 @@ public class Room {
                 connected = false;
             }
         } else {
-            tileSet = 0;
             if (code == 'D') {
+                tileSet = 0;
                 backDrop = Color.decode("#c0e5be");
                 connected = true;
             } else {
+                tileSet = 2;
                 backDrop = Color.decode("#352317");
                 connected = false;
             }

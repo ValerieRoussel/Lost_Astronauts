@@ -12,7 +12,7 @@ public class Bullet extends Obj {
         to_delete = false;
     }
 
-    public void move(ArrayList<Obj> walls, Camera cam, SoundManager sm) {
+    public void move(ArrayList<Obj> walls, ArrayList<Obj> stuff, Camera cam, SoundManager sm) {
         if (dir) {
             this.x += bulletSpeed;
         } else {
@@ -30,6 +30,13 @@ public class Bullet extends Obj {
                     ((SwitchTrigger) i).activate();
                     sm.playSound(sm.click);
                 }
+                return;
+            }
+        }
+        for (Obj i : stuff) {
+            if (i instanceof Enemy && rect.intersects(i.rect)) {
+                to_delete = true;
+                ((Enemy)i).takeDamage(1);
                 return;
             }
         }

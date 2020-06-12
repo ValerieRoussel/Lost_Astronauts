@@ -67,10 +67,22 @@ public class Game extends JPanel implements MouseListener {
                     updateSwitchWalls();
                 }
                 currPlayer.move(wallList, stuffList, sm, upgradesCollected);
-                Iterator itr = bulletList.iterator();
+
+                Iterator itr = stuffList.iterator();
+                while (itr.hasNext()) {
+                    Obj i = (Obj) itr.next();
+                    if (i instanceof Enemy) {
+                        ((Enemy)i).move(wallList);
+                        if (((Enemy)i).to_delete) {
+                            itr.remove();
+                        }
+                    }
+                }
+
+                itr = bulletList.iterator();
                 while (itr.hasNext()) {
                     Bullet i = (Bullet) itr.next();
-                    i.move(wallList, cam1, sm);
+                    i.move(wallList, stuffList, cam1, sm);
                     if (i.to_delete) {
                         itr.remove();
                     }
@@ -89,7 +101,7 @@ public class Game extends JPanel implements MouseListener {
                     if (currPlayer.crouching) {
                         yLoc++;
                     }
-                    if (currPlayer.lastDirection) {
+                    if (!currPlayer.slidingR && (currPlayer.slidingL || currPlayer.lastDirection)) {
                         bulletList.add(new Bullet(currPlayer.x + 16, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", true));
                     } else {
                         bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
@@ -102,6 +114,7 @@ public class Game extends JPanel implements MouseListener {
             }
 
             repaint();
+            ui.updateUI(currPlayer, p1, p2);
             ui.repaint();
 
             nextTick += skip;
@@ -119,13 +132,16 @@ public class Game extends JPanel implements MouseListener {
         g.translate(cam1.camX, cam1.camY);
         g.setColor(currPlayer.currRoom.backDrop);
         g.fillRect(0, 0, levelWidth * 16, levelHeight * 16);
-        for (Obj i : stuffList) {
-            g.drawImage(i.img, i.x, i.y, null);
-        }
         for (Obj i : bulletList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
         for (Obj i : wallList) {
+            g.drawImage(i.img, i.x, i.y, null);
+        }
+        for (Obj i : stuffList) {
+            if (i instanceof Enemy && ((Enemy)i).damageFrames > 0) {
+
+            }
             g.drawImage(i.img, i.x, i.y, null);
         }
         g.drawImage(currPlayer.img, currPlayer.x, currPlayer.y, null);
@@ -141,7 +157,6 @@ public class Game extends JPanel implements MouseListener {
         bulletList.clear();
         updateSwitchWalls();
         currPlayer.connected = currPlayer.currRoom.connected;
-        ui.updateUI(currPlayer, p1, p2);
         levelWidth = newRoom.levelDim.width;
         levelHeight = newRoom.levelDim.height;
     }
@@ -250,7 +265,6 @@ public class Game extends JPanel implements MouseListener {
 
     public void switchMenu() {
         if (inMenu) {
-            ui.updateUI(currPlayer, p1, p2);
             p1.resetUpgrades();
             p2.resetUpgrades();
             inMenu = false;

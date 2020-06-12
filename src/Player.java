@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class Player extends Obj {
     private boolean alive;
     private boolean grounded;
-    private boolean slidingL;
-    private boolean slidingR;
+    boolean slidingL;
+    boolean slidingR;
     private double speed;
     private int fallSpeed;
     private double dx;
@@ -29,6 +29,7 @@ public class Player extends Obj {
 
     int playerNum;
     int hp;
+    int damageFrames = 0;
     boolean connected;
     ArrayList<Upgrade> inventory;
 
@@ -50,6 +51,8 @@ public class Player extends Obj {
     private Image jl;
     private Image jlu;
     private Image jld;
+    private Image sl;
+    private Image sr;
     private Image crouchL;
     private Image crouchR;
 
@@ -73,7 +76,7 @@ public class Player extends Obj {
         nextRoomCode = null;
         oob = false;
         this.playerNum = playerNum;
-        hp = (3 - playerNum) * 50;
+        hp = 100;
         connected = true;
         inventory = new ArrayList<Upgrade>();
         roomList = new ArrayList<Room>();
@@ -88,6 +91,8 @@ public class Player extends Obj {
         jl = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jl.png").getImage();
         jlu = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jlu.png").getImage();
         jld = new ImageIcon("sprites/p" + playerNum + "/jump/P" + playerNum + "_jld.png").getImage();
+        sl = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_sl.png").getImage();
+        sr = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_sr.png").getImage();
         crouchL = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_crouchLeft.png").getImage();
         crouchR = new ImageIcon("sprites/p" + playerNum + "/P" + playerNum + "_crouchRight.png").getImage();
 
@@ -107,10 +112,21 @@ public class Player extends Obj {
         this.respawnY = y;
     }
 
+    public void takeDamage(int damage) {
+        if (damageFrames == 0) {
+            hp -= damage;
+            if (hp <= 0) {
+                die();
+            } else {
+                damageFrames = 48;
+            }
+        }
+    }
+
     public void move(ArrayList<Obj> wallList, ArrayList<Obj> stuffList, SoundManager sm, boolean[] collected) {
         stuffCollide(stuffList, sm, collected);
+        frameNum++;
         if (alive) {
-            frameNum++;
             calcXChange(sm);
             x += xChange;
             slidingL = false;
@@ -165,13 +181,21 @@ public class Player extends Obj {
                 frameNum = 0;
             }
             checkOOB();
+
+            if (damageFrames > 0) {
+                damageFrames--;
+                if (damageFrames % 16 > 7) {
+                    img = null;
+                }
+            }
+
         } else {
             if (frameNum >= 30) {
                 x = respawnX;
                 y = respawnY;
+                hp = 100;
                 alive = true;
             }
-            frameNum++;
         }
     }
 
@@ -180,11 +204,11 @@ public class Player extends Obj {
     }
 
     private Image getVerticalSprite() {
-        /*if (slidingL) {
-            return sL;
+        if (slidingL) {
+            return sl;
         } else if (slidingR) {
-            return sR;
-        }*/
+            return sr;
+        }
         if (dy < 0) {
             if (!lastDirection) {
                 return jlu;
@@ -250,6 +274,15 @@ public class Player extends Obj {
                         resetUpgrades();
                         sm.playSound(sm.collect);
                         return;
+                    } else if (i instanceof Enemy) {
+                        Rectangle lRect = new Rectangle(x, y, 4, height);
+                        Rectangle rRect = new Rectangle(x + width - 5, y, 4, height);
+                        if (i.rect.intersects(lRect) && !i.rect.intersects(rRect)) {
+                            dx = speed;
+                        } else if (i.rect.intersects(rRect) && !i.rect.intersects(lRect)) {
+                            dx = -speed;
+                        }
+                        takeDamage(10);
                     }
                 }
             }

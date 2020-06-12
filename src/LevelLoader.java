@@ -42,6 +42,10 @@ public class LevelLoader {
                             Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/space_floor.png");
                             newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
                             walls.add(newWall);
+                        } else if (tileSet == 2) {
+                            Obj newWall = new Obj(i * 16, j * 16, 16, 16, "sprites/walls/cave_floor.png");
+                            newWall.rect = new Rectangle(newWall.rect.x, newWall.rect.y + 2, newWall.rect.width, newWall.rect.height - 2);
+                            walls.add(newWall);
                         }
 
                     } else {
@@ -49,6 +53,8 @@ public class LevelLoader {
                             walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/temp_wall.png"));
                         } else if (tileSet == 1) {
                             walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/space_wall.png"));
+                        } else if (tileSet == 2) {
+                            walls.add(new Obj(i * 16, j * 16, 16, 16, "sprites/walls/cave_wall.png"));
                         }
                     }
                 } else if (inc.charAt(i) == 'q') {
@@ -60,6 +66,8 @@ public class LevelLoader {
                 } else if (inc.charAt(i) == 'p') {
                     pLoc.x = i * 16;
                     pLoc.y = (j * 16) + 2;
+                } else if (inc.charAt(i) == 'f') {
+                    stuff.add(new Enemy((i * 16)+1, (j * 16)+4, 14, 14, "frog"));
                 } else if (Character.isUpperCase(inc.charAt(i))) {
                     neighbors.add(inc.charAt(i));
                     stuff.add(new Door(i * 16, j * 16, 16, 32, "", (prev != null && next != null), inc.charAt(i)));
