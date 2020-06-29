@@ -8,7 +8,10 @@ public class TOJam_2020 {
     //Character and wall tiles are 16X16 pixels
 
     public static void main(String []args) {
+        createGame();
+    }
 
+    public static void createGame() {
         JSplitPane splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPaneV.setDividerSize(0);
 

@@ -6,6 +6,7 @@ public class TradeMenu {
     Image p1_frame = new ImageIcon(path + "P1_tradeFrame.png").getImage();
     Image p2_frame = new ImageIcon(path + "P2_tradeFrame.png").getImage();
     Image instruct = new ImageIcon(path + "instruct.png").getImage();
+    Image pause = new ImageIcon("sprites/icons/PauseMenu.png").getImage();
 
     Coord[] upgradeSlots = {
             new Coord(4, 4),
@@ -33,6 +34,25 @@ public class TradeMenu {
         }
         for (int i = 0; i < p2.inventory.size() && i < upgradeSlots.length; i++) {
             g.drawImage(p2.inventory.get(i).largeIcon, p2_frameX + upgradeSlots[i].x, frameY + upgradeSlots[i].y, null);
+        }
+    }
+
+    public void drawPauseMenu(Graphics g, Camera cam, boolean[] upgrades) {
+        int frameX = -cam.camX + 64;
+        int frameY = -cam.camY + 12;
+
+        g.setColor(new Color(0f, 0f,0f, 0.8f));
+        g.fillRect(-cam.camX, -cam.camY, 200, 132);
+        g.drawImage(pause, frameX, frameY, null);
+        g.setColor(new Color(0f, 0f,0f, 1.0f));
+        if (!upgrades[0]) {
+            g.fillRect(frameX + 7, frameY + 47, 58, 10);
+        }
+        if (!upgrades[1]) {
+            g.fillRect(frameX + 7, frameY + 57, 58, 10);
+        }
+        if (!upgrades[2]) {
+            g.fillRect(frameX + 7, frameY + 67, 58, 10);
         }
     }
 

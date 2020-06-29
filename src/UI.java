@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class UI extends JPanel {
     String path = "sprites/icons/";
     int healthPixels;
+    int frameNum;
     ArrayList<Upgrade> inv = new ArrayList<Upgrade>();
     Coord[] upgradeSlots = {
             new Coord(4, 4),
@@ -25,9 +26,17 @@ public class UI extends JPanel {
     private Image p2_main = new ImageIcon(path + "P2_main.png").getImage();
     private Image con = new ImageIcon(path + "connection.png").getImage();
     private Image discon = new ImageIcon(path + "noConnection.png").getImage();
+    private Image help = new ImageIcon(path + "help.png").getImage();
+
+    private Image p1_map1 = new ImageIcon(path + "P1_map1.png").getImage();
+    private Image p1_map2 = new ImageIcon(path + "P1_map2.png").getImage();
+    private Image p2_map1 = new ImageIcon(path + "P2_map1.png").getImage();
+    private Image p2_map2 = new ImageIcon(path + "P2_map2.png").getImage();
 
     Image inventory = new ImageIcon(path + "inventory.png").getImage();
 
+    Image map;
+    int mapNum;
     Image p1_connection;
     Image connectionStatus;
     Image p2_connection;
@@ -37,10 +46,13 @@ public class UI extends JPanel {
     public UI() {
         p1_connection = p1_connected;
         p2_connection = p2_connected;
+        map = p2_map1;
+        mapNum = 1;
         connectionStatus = con;
         switchIcon = p2_switch;
         mainIcon = p1_main;
         healthPixels = 14;
+        frameNum = 0;
     }
 
     public void updateUI(Player currPlayer, Player p1, Player p2) {
@@ -65,13 +77,34 @@ public class UI extends JPanel {
         if (currPlayer.playerNum == 1) {
             mainIcon = p1_main;
             switchIcon = p2_switch;
+            if (mapNum == 1) {
+                map = p1_map1;
+            } else {
+                map = p1_map2;
+            }
         } else {
             mainIcon = p2_main;
             switchIcon = p1_switch;
+            if (mapNum == 1) {
+                map = p2_map1;
+            } else {
+                map = p2_map2;
+            }
         }
         float healthFloat = (float)(currPlayer.hp)/100;
         healthPixels = (int)Math.ceil(healthFloat * 14);
         inv = currPlayer.inventory;
+
+        if (frameNum < 45) {
+            frameNum++;
+        } else {
+            if (mapNum == 1) {
+                mapNum = 2;
+            } else {
+                mapNum = 1;
+            }
+            frameNum = 0;
+        }
     }
 
     public void paint(Graphics g) {
@@ -81,6 +114,7 @@ public class UI extends JPanel {
         g.fillRect(0, 0, 200, 18);
 
         g.drawImage(mainIcon, 92, 1, null);
+        g.drawImage(map, 114, 1, null);
         g.setColor(Color.decode("#67d100"));
         g.fillRect(93, 14, healthPixels, 2);
 
@@ -89,7 +123,8 @@ public class UI extends JPanel {
         g.drawImage(p1_connection, 2, 4, null);
         g.drawImage(connectionStatus, 29, 4, null);
         g.drawImage(p2_connection, 51, 4, null);
-        g.drawImage(switchIcon, 224, 4, null);
+        g.drawImage(switchIcon, 194, 4, null);
+        g.drawImage(help, 244, 0, null);
 
         ((Graphics2D) g).setTransform(oldXForm);
         ((Graphics2D)g).scale(2, 2);

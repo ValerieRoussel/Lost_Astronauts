@@ -21,7 +21,7 @@ public class Room {
     ArrayList<Obj> stuffList;
     ArrayList<Character> neighbors;
 
-    public Room(boolean world, char code, LevelLoader ll) {
+    public Room(boolean world, char code, LevelLoader ll, ArrayList<Character> brokenWalls) {
         this.world = world;
         this.code = code;
         pStartPos = new Coord(0, 0);
@@ -38,7 +38,7 @@ public class Room {
                 connected = false;
             }
         } else {
-            if (code == 'D') {
+            if (code == 'D' || code == 'G' || code == 'J') {
                 tileSet = 0;
                 backDrop = Color.decode("#c0e5be");
                 connected = true;
@@ -53,6 +53,15 @@ public class Room {
             loadRoom("levels/world1/level" + code + ".txt", ll);
         } else {
             loadRoom("levels/world2/level" + code + ".txt", ll);
+        }
+
+        if (brokenWalls.contains(code)) {
+            for (Obj i : wallList) {
+                if (i instanceof BrokenWall) {
+                    wallList.remove(i);
+                    break;
+                }
+            }
         }
 
     }

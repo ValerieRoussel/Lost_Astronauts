@@ -16,8 +16,8 @@ public class Player extends Obj {
     private int animFrame = 0;
 
     private int xChange = 0;
-    private int respawnX;
-    private int respawnY;
+    int respawnX;
+    int respawnY;
 
     boolean lastDirection;
     boolean crouching;
@@ -40,6 +40,7 @@ public class Player extends Obj {
 
     private boolean wallJump;
     private boolean highJump;
+    boolean grenade;
 
     private Image idleL;
     private Image idleR;
@@ -71,6 +72,7 @@ public class Player extends Obj {
 
         wallJump = false;
         highJump = false;
+        grenade = false;
 
         currRoom = null;
         nextRoomCode = null;
@@ -104,7 +106,6 @@ public class Player extends Obj {
         this.y = y;
         dx = 0;
         dy = 0;
-        setRespawnPosition(x, y);
     }
 
     public void setRespawnPosition(int x, int y) {
@@ -233,12 +234,15 @@ public class Player extends Obj {
     public void resetUpgrades() {
         wallJump = false;
         highJump = false;
+        grenade = false;
         for (int i = 0; i < inventory.size(); i++) {
             int num = inventory.get(i).upgradeNum;
             if (num == 0) {
                 wallJump = true;
             } else if (num == 1) {
                 highJump = true;
+            } else if (num == 2) {
+                grenade = true;
             }
         }
     }
@@ -266,6 +270,9 @@ public class Player extends Obj {
                 if (rect.intersects(i.rect)) {
                     if (i instanceof Door) {
                         nextRoomCode = ((Door) i).nextRoomCode;
+                        return;
+                    } else if (i instanceof KillPit) {
+                        nextRoomCode = null;
                         return;
                     } else if (i instanceof UpgradePickup) {
                         inventory.add(new Upgrade(((UpgradePickup) i).num));

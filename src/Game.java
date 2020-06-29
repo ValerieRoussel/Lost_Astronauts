@@ -8,11 +8,13 @@ import java.util.Iterator;
 public class Game extends JPanel implements MouseListener {
     private int levelWidth;
     private int levelHeight;
+    boolean gameRunning = true;
 
     Player p1;
     Player p2;
     Player currPlayer;
     boolean inMenu;
+    boolean pauseMenu;
     private Camera cam1;
     private TradeMenu tm;
     private UI ui;
@@ -20,30 +22,38 @@ public class Game extends JPanel implements MouseListener {
     private LevelLoader l1;
     private ArrayList<Obj> wallList;
     private ArrayList<Obj> stuffList;
+    private ArrayList<Character> brokenWalls;
     private ArrayList<Bullet> bulletList;
 
-    boolean[] upgradesCollected = {false, false, false, false, false, false};
+    boolean[] upgradesCollected;
     boolean blueSwitch;
+    boolean yellowSwitch;
 
     public Game(UI ui) {
+        this.ui = ui;
+        startGame();
+        this.addMouseListener(this);
+    }
+
+    public void startGame() {
+        brokenWalls = new ArrayList<Character>();
         bulletList = new ArrayList<Bullet>();
         p1 = new Player(0, 0, 16, 16, 1);
         p2 = new Player(0, 0, 16, 16, 2);
         cam1 = new Camera();
         tm = new TradeMenu();
-        this.ui = ui;
         sm = new SoundManager();
         inMenu = false;
+        pauseMenu = false;
         currPlayer = p1;
         l1 = new LevelLoader();
 
+        upgradesCollected = new boolean[] {false, false, false, false, false, false};
         enterRoom(p1, 'A');
         enterRoom(p2, 'A');
-
         blueSwitch = false;
-
+        yellowSwitch = false;
         ui.updateUI(currPlayer, p1, p2);
-        this.addMouseListener(this);
     }
 
     public void run() {
@@ -56,14 +66,22 @@ public class Game extends JPanel implements MouseListener {
         int rof = 30;
         int rofCounter = 0;
 
-        while (true) {
+        while (gameRunning) {
 
-            if (!inMenu) {
-                if (currPlayer.oob && currPlayer.nextRoomCode != null) {
-                    enterRoom(currPlayer, currPlayer.nextRoomCode);
+            if (!inMenu && !pauseMenu) {
+                if (currPlayer.oob) {
+                    if (currPlayer.nextRoomCode != null) {
+                        enterRoom(currPlayer, currPlayer.nextRoomCode);
+                    } else {
+                        currPlayer.setPosition(currPlayer.respawnX, currPlayer.respawnY);
+                    }
                 }
                 if (blueSwitch != SwitchTrigger.blueSwitch) {
                     blueSwitch = SwitchTrigger.blueSwitch;
+                    updateSwitchWalls();
+                }
+                if (yellowSwitch != SwitchTrigger.yellowSwitch) {
+                    yellowSwitch = SwitchTrigger.yellowSwitch;
                     updateSwitchWalls();
                 }
                 currPlayer.move(wallList, stuffList, sm, upgradesCollected);
@@ -82,7 +100,7 @@ public class Game extends JPanel implements MouseListener {
                 itr = bulletList.iterator();
                 while (itr.hasNext()) {
                     Bullet i = (Bullet) itr.next();
-                    i.move(wallList, stuffList, cam1, sm);
+                    i.move(wallList, stuffList, cam1, sm, brokenWalls, currPlayer.currRoom);
                     if (i.to_delete) {
                         itr.remove();
                     }
@@ -102,15 +120,21 @@ public class Game extends JPanel implements MouseListener {
                         yLoc++;
                     }
                     if (!currPlayer.slidingR && (currPlayer.slidingL || currPlayer.lastDirection)) {
-                        bulletList.add(new Bullet(currPlayer.x + 16, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", true));
+                        if (currPlayer.crouching && currPlayer.grenade) {
+                            bulletList.add(new Grenade(currPlayer.x + 16, currPlayer.y + yLoc-1, 4, 3, "sprites/grenade.png", true));
+                        } else {
+                            bulletList.add(new Bullet(currPlayer.x + 16, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", true));
+                        }
                     } else {
-                        bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
+                        if (currPlayer.crouching && currPlayer.grenade) {
+                            bulletList.add(new Grenade(currPlayer.x - 4, currPlayer.y + yLoc-1, 4, 3, "sprites/grenadeL.png", false));
+                        } else {
+                            bulletList.add(new Bullet(currPlayer.x - 2, currPlayer.y + yLoc, 2, 1, "sprites/bullet.png", false));
+                        }
                     }
                     sm.playSound(sm.shoot);
                 }
                 cam1.reposition(currPlayer, levelWidth * 16, levelHeight * 16);
-            } else {
-                currPlayer.switchOff();
             }
 
             repaint();
@@ -147,6 +171,8 @@ public class Game extends JPanel implements MouseListener {
         g.drawImage(currPlayer.img, currPlayer.x, currPlayer.y, null);
         if (inMenu) {
             tm.drawMenu(g, cam1, p1, p2);
+        } else if (pauseMenu) {
+            tm.drawPauseMenu(g, cam1, upgradesCollected);
         }
     }
 
@@ -179,18 +205,18 @@ public class Game extends JPanel implements MouseListener {
 
         if (p.currRoom == null) {
             if (p == p1) {
-                p.roomList.add(p.currRoom = new Room(false, newRoomCode, l1));
+                p.roomList.add(p.currRoom = new Room(false, newRoomCode, l1, brokenWalls));
             } else {
-                p.roomList.add(p.currRoom = new Room(true, newRoomCode, l1));
+                p.roomList.add(p.currRoom = new Room(true, newRoomCode, l1, brokenWalls));
             }
         }
 
         for (char i : p.currRoom.neighbors) {
             if (i != lastCode)
                 if (p == p1) {
-                    p.roomList.add(removeDuplicates(new Room(false, i, l1)));
+                    p.roomList.add(removeDuplicates(new Room(false, i, l1, brokenWalls)));
                 } else {
-                    p.roomList.add(removeDuplicates(new Room(true, i, l1)));
+                    p.roomList.add(removeDuplicates(new Room(true, i, l1, brokenWalls)));
                 }
         }
 
@@ -215,6 +241,7 @@ public class Game extends JPanel implements MouseListener {
                 break;
             }
         }
+        p.setRespawnPosition(p.currRoom.pStartPos.x, p.currRoom.pStartPos.y);
         p.connected = p.currRoom.connected;
 
         p.nextRoomCode = null;
@@ -241,13 +268,17 @@ public class Game extends JPanel implements MouseListener {
                     ((SwitchWall) i).update();
                 } else if (((SwitchWall) i).color == "red" && blueSwitch == ((SwitchWall) i).on) {
                     ((SwitchWall) i).update();
+                } else if (((SwitchWall) i).color == "yellow" && yellowSwitch != ((SwitchWall) i).on) {
+                    ((SwitchWall) i).update();
+                } else if (((SwitchWall) i).color == "pink" && yellowSwitch == ((SwitchWall) i).on) {
+                    ((SwitchWall) i).update();
                 }
             }
         }
     }
 
     public void switchPlayer() {
-        if (!inMenu) {
+        if (!inMenu && !pauseMenu) {
             currPlayer.switchOff();
             if (currPlayer == p1) {
                 p1.currRoom.pStartPos.x = p1.x;
@@ -264,12 +295,20 @@ public class Game extends JPanel implements MouseListener {
     }
 
     public void switchMenu() {
-        if (inMenu) {
-            p1.resetUpgrades();
-            p2.resetUpgrades();
-            inMenu = false;
-        } else if (p1.connected && p2.connected) {
-            inMenu = true;
+        if (!pauseMenu) {
+            if (inMenu) {
+                p1.resetUpgrades();
+                p2.resetUpgrades();
+                inMenu = false;
+            } else if (p1.connected && p2.connected) {
+                inMenu = true;
+            }
+        }
+    }
+
+    public void switchPause() {
+        if (!inMenu) {
+            pauseMenu = !pauseMenu;
         }
     }
 
@@ -282,6 +321,19 @@ public class Game extends JPanel implements MouseListener {
             int mouseX = (int)Math.floor(e.getX() / 4);
             int mouseY = (int)Math.floor(e.getY() / 4);
             tm.trade(mouseX, mouseY, p1, p2, sm);
+        } else if (pauseMenu) {
+            int mouseX = (int)Math.floor(e.getX() / 4);
+            int mouseY = (int)Math.floor(e.getY() / 4);
+            if (mouseY > 12 + 82 && mouseY < 12 + 92) {
+                if (mouseX > 64 + 6 && mouseX < 64 + 34) {
+                    //restart
+                    startGame();
+                } else if (mouseX > 64 + 37 && mouseX < 64 + 65) {
+                    //quit
+                    gameRunning = false;
+                }
+            }
+
         }
     }
 

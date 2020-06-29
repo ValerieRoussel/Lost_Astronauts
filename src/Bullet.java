@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Bullet extends Obj {
     private int bulletSpeed = 4;
-    private boolean dir;
+    protected boolean dir;
 
     public boolean to_delete;
 
@@ -12,7 +12,7 @@ public class Bullet extends Obj {
         to_delete = false;
     }
 
-    public void move(ArrayList<Obj> walls, ArrayList<Obj> stuff, Camera cam, SoundManager sm) {
+    public void move(ArrayList<Obj> walls, ArrayList<Obj> stuff, Camera cam, SoundManager sm, ArrayList<Character> brokenWalls, Room currRoom) {
         if (dir) {
             this.x += bulletSpeed;
         } else {
