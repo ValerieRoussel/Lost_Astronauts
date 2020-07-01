@@ -38,6 +38,10 @@ public class Bullet extends Obj {
                 to_delete = true;
                 ((Enemy)i).takeDamage(1);
                 return;
+            } else if (i instanceof Boss && rect.intersects(((Boss) i).eyeBox)) {
+                to_delete = true;
+                ((Boss)i).takeDamage(1);
+                return;
             }
         }
     }

@@ -83,9 +83,11 @@ public class LevelLoader {
                     pLoc.y = (j * 16) + 2;
                 } else if (inc.charAt(i) == 'f') {
                     stuff.add(new Enemy((i * 16)+1, (j * 16)+4, 14, 14, "frog"));
+                } else if (inc.charAt(i) == 'g') {
+                    stuff.add(new Boss(i * 16, (j * 16)+2));
                 } else if (inc.charAt(i) == '@') {
                     stuff.add(new KillPit(i * 16, j * 16));
-                } else if (Character.isUpperCase(inc.charAt(i))) {
+                }else if (Character.isUpperCase(inc.charAt(i))) {
                     neighbors.add(inc.charAt(i));
                     stuff.add(new Door(i * 16, j * 16, 16, 32, "", (prev != null && next != null), inc.charAt(i)));
                 } else if (inc.charAt(i) != '0' && Character.isDigit(inc.charAt(i))) {

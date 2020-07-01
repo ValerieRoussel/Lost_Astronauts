@@ -15,6 +15,7 @@ public class Game extends JPanel implements MouseListener {
     Player currPlayer;
     boolean inMenu;
     boolean pauseMenu;
+    boolean endMenu;
     private Camera cam1;
     private TradeMenu tm;
     private UI ui;
@@ -45,6 +46,7 @@ public class Game extends JPanel implements MouseListener {
         sm = new SoundManager();
         inMenu = false;
         pauseMenu = false;
+        endMenu = false;
         currPlayer = p1;
         l1 = new LevelLoader();
 
@@ -68,11 +70,12 @@ public class Game extends JPanel implements MouseListener {
 
         while (gameRunning) {
 
-            if (!inMenu && !pauseMenu) {
+            if (!inMenu && !pauseMenu && !endMenu) {
                 if (currPlayer.oob) {
                     if (currPlayer.nextRoomCode != null) {
                         enterRoom(currPlayer, currPlayer.nextRoomCode);
                     } else {
+                        currPlayer.takeDamage(5);
                         currPlayer.setPosition(currPlayer.respawnX, currPlayer.respawnY);
                     }
                 }
@@ -93,6 +96,11 @@ public class Game extends JPanel implements MouseListener {
                         ((Enemy)i).move(wallList);
                         if (((Enemy)i).to_delete) {
                             itr.remove();
+                        }
+                    } else if (i instanceof Boss) {
+                        ((Boss) i).move(wallList, currPlayer);
+                        if (((Boss) i).dead == true) {
+                            endMenu = true;
                         }
                     }
                 }
@@ -156,16 +164,17 @@ public class Game extends JPanel implements MouseListener {
         g.translate(cam1.camX, cam1.camY);
         g.setColor(currPlayer.currRoom.backDrop);
         g.fillRect(0, 0, levelWidth * 16, levelHeight * 16);
-        for (Obj i : bulletList) {
-            g.drawImage(i.img, i.x, i.y, null);
-        }
         for (Obj i : wallList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
         for (Obj i : stuffList) {
-            if (i instanceof Enemy && ((Enemy)i).damageFrames > 0) {
-
+            if (i instanceof Boss) {
+                ((Boss) i).draw(g);
+            } else {
+                g.drawImage(i.img, i.x, i.y, null);
             }
+        }
+        for (Obj i : bulletList) {
             g.drawImage(i.img, i.x, i.y, null);
         }
         g.drawImage(currPlayer.img, currPlayer.x, currPlayer.y, null);
@@ -173,6 +182,8 @@ public class Game extends JPanel implements MouseListener {
             tm.drawMenu(g, cam1, p1, p2);
         } else if (pauseMenu) {
             tm.drawPauseMenu(g, cam1, upgradesCollected);
+        } else if (endMenu) {
+            tm.drawEndMenu(g, cam1);
         }
     }
 
@@ -278,7 +289,7 @@ public class Game extends JPanel implements MouseListener {
     }
 
     public void switchPlayer() {
-        if (!inMenu && !pauseMenu) {
+        if (!inMenu && !pauseMenu && !endMenu) {
             currPlayer.switchOff();
             if (currPlayer == p1) {
                 p1.currRoom.pStartPos.x = p1.x;
@@ -295,7 +306,7 @@ public class Game extends JPanel implements MouseListener {
     }
 
     public void switchMenu() {
-        if (!pauseMenu) {
+        if (!pauseMenu && !endMenu) {
             if (inMenu) {
                 p1.resetUpgrades();
                 p2.resetUpgrades();
@@ -307,7 +318,7 @@ public class Game extends JPanel implements MouseListener {
     }
 
     public void switchPause() {
-        if (!inMenu) {
+        if (!inMenu && !endMenu) {
             pauseMenu = !pauseMenu;
         }
     }
@@ -321,12 +332,13 @@ public class Game extends JPanel implements MouseListener {
             int mouseX = (int)Math.floor(e.getX() / 4);
             int mouseY = (int)Math.floor(e.getY() / 4);
             tm.trade(mouseX, mouseY, p1, p2, sm);
-        } else if (pauseMenu) {
+        } else if (pauseMenu || endMenu) {
             int mouseX = (int)Math.floor(e.getX() / 4);
             int mouseY = (int)Math.floor(e.getY() / 4);
             if (mouseY > 12 + 82 && mouseY < 12 + 92) {
                 if (mouseX > 64 + 6 && mouseX < 64 + 34) {
                     //restart
+                    endMenu = false;
                     startGame();
                 } else if (mouseX > 64 + 37 && mouseX < 64 + 65) {
                     //quit

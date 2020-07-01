@@ -281,7 +281,7 @@ public class Player extends Obj {
                         resetUpgrades();
                         sm.playSound(sm.collect);
                         return;
-                    } else if (i instanceof Enemy) {
+                    } else if (i instanceof Enemy || i instanceof Boss) {
                         Rectangle lRect = new Rectangle(x, y, 4, height);
                         Rectangle rRect = new Rectangle(x + width - 5, y, 4, height);
                         if (i.rect.intersects(lRect) && !i.rect.intersects(rRect)) {

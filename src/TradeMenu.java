@@ -7,6 +7,7 @@ public class TradeMenu {
     Image p2_frame = new ImageIcon(path + "P2_tradeFrame.png").getImage();
     Image instruct = new ImageIcon(path + "instruct.png").getImage();
     Image pause = new ImageIcon("sprites/icons/PauseMenu.png").getImage();
+    Image end = new ImageIcon("sprites/icons/endMenu.png").getImage();
 
     Coord[] upgradeSlots = {
             new Coord(4, 4),
@@ -54,6 +55,15 @@ public class TradeMenu {
         if (!upgrades[2]) {
             g.fillRect(frameX + 7, frameY + 67, 58, 10);
         }
+    }
+
+    public void drawEndMenu(Graphics g, Camera cam) {
+        int frameX = -cam.camX + 64;
+        int frameY = -cam.camY + 12;
+
+        g.setColor(new Color(0f, 0f,0f, 1.0f));
+        g.fillRect(-cam.camX, -cam.camY, 200, 132);
+        g.drawImage(end, frameX, frameY, null);
     }
 
     public void trade(int x, int y, Player p1, Player p2, SoundManager sm) {
