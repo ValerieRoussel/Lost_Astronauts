@@ -34,6 +34,7 @@ public class Game extends JPanel implements MouseListener {
         this.ui = ui;
         startGame();
         this.addMouseListener(this);
+        sm.playSoundLoop();
     }
 
     public void startGame() {
@@ -55,7 +56,7 @@ public class Game extends JPanel implements MouseListener {
         enterRoom(p2, 'A');
         blueSwitch = false;
         yellowSwitch = false;
-        ui.updateUI(currPlayer, p1, p2);
+        ui.updateUI(currPlayer, p1, p2, sm);
     }
 
     public void run() {
@@ -98,7 +99,7 @@ public class Game extends JPanel implements MouseListener {
                             itr.remove();
                         }
                     } else if (i instanceof Boss) {
-                        ((Boss) i).move(wallList, currPlayer);
+                        ((Boss) i).move(wallList, currPlayer, sm);
                         if (((Boss) i).dead == true) {
                             endMenu = true;
                         }
@@ -146,7 +147,7 @@ public class Game extends JPanel implements MouseListener {
             }
 
             repaint();
-            ui.updateUI(currPlayer, p1, p2);
+            ui.updateUI(currPlayer, p1, p2, sm);
             ui.repaint();
 
             nextTick += skip;
@@ -275,13 +276,13 @@ public class Game extends JPanel implements MouseListener {
     public void updateSwitchWalls() {
         for (Obj i : wallList) {
             if (i instanceof SwitchWall) {
-                if (((SwitchWall) i).color == "blue" && blueSwitch != ((SwitchWall) i).on) {
+                if (((SwitchWall) i).color.equals("blue") && blueSwitch != ((SwitchWall) i).on) {
                     ((SwitchWall) i).update();
-                } else if (((SwitchWall) i).color == "red" && blueSwitch == ((SwitchWall) i).on) {
+                } else if (((SwitchWall) i).color.equals("red") && blueSwitch == ((SwitchWall) i).on) {
                     ((SwitchWall) i).update();
-                } else if (((SwitchWall) i).color == "yellow" && yellowSwitch != ((SwitchWall) i).on) {
+                } else if (((SwitchWall) i).color.equals("yellow") && yellowSwitch != ((SwitchWall) i).on) {
                     ((SwitchWall) i).update();
-                } else if (((SwitchWall) i).color == "pink" && yellowSwitch == ((SwitchWall) i).on) {
+                } else if (((SwitchWall) i).color.equals("pink") && yellowSwitch == ((SwitchWall) i).on) {
                     ((SwitchWall) i).update();
                 }
             }

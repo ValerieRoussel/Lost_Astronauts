@@ -15,7 +15,7 @@ public class Grenade extends Bullet{
         exploded = false;
     }
 
-    public void explode() {
+    public void explode(SoundManager sm) {
         bulletSpeed = 0;
         exploded = true;
         x -= 6;
@@ -23,6 +23,7 @@ public class Grenade extends Bullet{
         width = 16;
         height = 16;
         updateRect();
+        sm.playSound(sm.explode);
         img = explosion;
     }
 
@@ -53,14 +54,15 @@ public class Grenade extends Bullet{
                     brokenWalls.add(currRoom.code);
                     walls.remove(i);
                 }
-                explode();
+                explode(sm);
                 return;
             }
         }
         for (Obj i : stuff) {
             if (i instanceof Enemy && rect.intersects(i.rect)) {
                 ((Enemy)i).takeDamage(3);
-                explode();
+                sm.playSound(sm.splat);
+                explode(sm);
                 return;
             }
         }

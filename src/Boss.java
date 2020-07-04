@@ -1,3 +1,4 @@
+import javax.sound.sampled.SourceDataLine;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -61,19 +62,19 @@ public class Boss extends Obj {
         currEye = eyeL[0];
     }
 
-    public void move(ArrayList<Obj> wallList, Player p) {
+    public void move(ArrayList<Obj> wallList, Player p, SoundManager sm) {
         updateEye(p);
         if (grounded) {
             frameNum--;
             if (frameNum <= 0) {
                 if ((!bigLoc && loc == 1) || (bigLoc && loc == -1)) {
                     if (repeat) {
-                        smallJump();
+                        smallJump(sm);
                     } else {
-                        bigJump();
+                        bigJump(sm);
                     }
                 } else {
-                    smallJump();
+                    smallJump(sm);
                 }
             }
         } else {
@@ -87,7 +88,7 @@ public class Boss extends Obj {
                     dy++;
                 }
             }
-            yCollide(wallList);
+            yCollide(wallList, sm);
         }
         x += dx;
         y += dy;
@@ -98,7 +99,7 @@ public class Boss extends Obj {
         }
     }
 
-    private void yCollide(ArrayList<Obj> wallList) {
+    private void yCollide(ArrayList<Obj> wallList, SoundManager sm) {
         updateRect();
         for (Obj i : wallList) {
             if ((new Rectangle(x, y + 1, width, height)).intersects(i.rect)) {
@@ -110,17 +111,19 @@ public class Boss extends Obj {
                     jumpFrame = 0;
                     frameNum = 30;
                     bigJumping = false;
+                    sm.playSound(sm.land);
                 }
             }
         }
     }
 
-    private void bigJump(){
+    private void bigJump(SoundManager sm){
         if (!charging) {
             frameNum = 40;
         } else {
             grounded = false;
             bigJumping = true;
+            sm.playSound(sm.deepjump);
             if (bigLoc) {
                 dx = -2;
             } else {
@@ -133,7 +136,7 @@ public class Boss extends Obj {
         charging = !charging;
     }
 
-    private void smallJump(){
+    private void smallJump(SoundManager sm){
         if (!crouching) {
             frameNum = 20;
         } else {
@@ -141,6 +144,7 @@ public class Boss extends Obj {
                 repeat = false;
             }
             grounded = false;
+            sm.playSound(sm.deepjump);
             if (jumpDir) {
                 dx = -1;
                 loc--;

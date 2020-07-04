@@ -132,8 +132,8 @@ public class Player extends Obj {
             x += xChange;
             slidingL = false;
             slidingR = false;
-            crouching = false;
             xCollide(wallList);
+            crouching = false;
 
             if (to_crouch && grounded) {
                 crouching = true;
@@ -371,7 +371,7 @@ public class Player extends Obj {
        }
 
        if (to_left && !to_right) {
-           if (grounded) {
+           if (grounded && !crouching) {
                if (animFrame == 23) {
                    animFrame = 0;
                } else {
@@ -389,7 +389,7 @@ public class Player extends Obj {
                xChange--;
            }
        } else if (!to_left && to_right) {
-           if (grounded) {
+           if (grounded && !crouching) {
                if (animFrame == 23) {
                    animFrame = 0;
                } else {

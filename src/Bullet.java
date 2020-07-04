@@ -37,10 +37,12 @@ public class Bullet extends Obj {
             if (i instanceof Enemy && rect.intersects(i.rect)) {
                 to_delete = true;
                 ((Enemy)i).takeDamage(1);
+                sm.playSound(sm.splat);
                 return;
             } else if (i instanceof Boss && rect.intersects(((Boss) i).eyeBox)) {
                 to_delete = true;
                 ((Boss)i).takeDamage(1);
+                sm.playSound(sm.splat);
                 return;
             }
         }

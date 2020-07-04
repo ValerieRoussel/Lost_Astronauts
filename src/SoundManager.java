@@ -14,6 +14,13 @@ public class SoundManager {
     URL land;
     URL step1;
     URL step2;
+    URL splat;
+    URL explode;
+    URL deepjump;
+    URL yes;
+    URL no;
+
+    URL song;
 
     public SoundManager() {
         shoot = loadSound("shoot.wav");
@@ -25,6 +32,12 @@ public class SoundManager {
         land = loadSound("land.wav");
         step1 = loadSound("step1.wav");
         step2 = loadSound("step2.wav");
+        splat = loadSound("splat.wav");
+        explode = loadSound("explode.wav");
+        deepjump = loadSound("deepjump.wav");
+        yes = loadSound("yes.wav");
+        no = loadSound("no.wav");
+        song = loadSound("song.wav");
     }
 
     public URL loadSound(String soundFile) {
@@ -44,6 +57,23 @@ public class SoundManager {
                     Clip clip = AudioSystem.getClip();
                     clip.open(audioIn);
                     clip.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage()); 
+                }
+            }
+        }).start();
+    }
+    public void playSoundLoop() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    AudioInputStream audioIn = AudioSystem.getAudioInputStream(song);
+                    Clip clip = AudioSystem.getClip();
+                    clip.open(audioIn);
+                    clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    while (true) {
+                        Thread.sleep(10000);
+                    }
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
                 }

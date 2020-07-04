@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class UI extends JPanel {
     String path = "sprites/icons/";
+    boolean co = false;
     int healthPixels;
     int frameNum;
     ArrayList<Upgrade> inv = new ArrayList<Upgrade>();
@@ -55,7 +56,7 @@ public class UI extends JPanel {
         frameNum = 0;
     }
 
-    public void updateUI(Player currPlayer, Player p1, Player p2) {
+    public void updateUI(Player currPlayer, Player p1, Player p2, SoundManager sm) {
         if (p1.connected) {
             p1_connection = p1_connected;
         } else {
@@ -104,6 +105,14 @@ public class UI extends JPanel {
                 mapNum = 1;
             }
             frameNum = 0;
+        }
+        if (p1.connected && p2.connected && !co) {
+            sm.playSound(sm.yes);
+            co = true;
+        }
+        if ((!p1.connected || !p2.connected) && co) {
+            sm.playSound(sm.no);
+            co = false;
         }
     }
 
